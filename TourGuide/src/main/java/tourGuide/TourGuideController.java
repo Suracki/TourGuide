@@ -1,6 +1,7 @@
 package tourGuide;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,6 +75,14 @@ public class TourGuideController {
     
     private User getUser(String userName) {
     	return tourGuideService.getUser(userName);
+    }
+
+    @RequestMapping("/addUser")
+    public User addUser(@RequestParam String userName) {
+        System.out.println("Adding " + userName);
+        User user = new User(new UUID(1,2), userName, "number","email");
+        tourGuideService.addUser(user);
+        return user;
     }
    
 
