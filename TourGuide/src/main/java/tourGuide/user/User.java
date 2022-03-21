@@ -62,7 +62,7 @@ public class User {
 	}
 	
 	public List<VisitedLocation> getVisitedLocations() {
-		return visitedLocations;
+		return new ArrayList<VisitedLocation>(visitedLocations);
 	}
 	
 	public void clearVisitedLocations() {
@@ -76,7 +76,7 @@ public class User {
 	}
 	
 	public List<UserReward> getUserRewards() {
-		return userRewards;
+		return new ArrayList<UserReward>(userRewards);
 	}
 	
 	public UserPreferences getUserPreferences() {

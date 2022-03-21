@@ -1,14 +1,19 @@
 package tourGuide;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import gpsUtil.GpsUtil;
 import rewardCentral.RewardCentral;
 import tourGuide.service.RewardsService;
+import tourGuide.service.UserService;
+import tourGuide.user.User;
 
 @Configuration
 public class TourGuideModule {
+	@Autowired
+	UserService userService;
 	
 	@Bean
 	public GpsUtil getGpsUtil() {
@@ -17,7 +22,7 @@ public class TourGuideModule {
 	
 	@Bean
 	public RewardsService getRewardsService() {
-		return new RewardsService(getGpsUtil(), getRewardCentral());
+		return new RewardsService(getGpsUtil(), getRewardCentral(), userService);
 	}
 	
 	@Bean
