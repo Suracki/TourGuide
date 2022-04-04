@@ -183,6 +183,41 @@ public class RewardsService {
 		//System.out.println("Rewards Done!");
 	}
 
+	public String calculateRewardsReturn(User user) {
+
+		List<VisitedLocation> userLocations = user.getVisitedLocations();
+		List<Attraction> attractions = gpsService.getAttractions();
+
+		CopyOnWriteArrayList<CompletableFuture> futures = new CopyOnWriteArrayList<CompletableFuture>();
+
+		for(VisitedLocation visitedLocation : userLocations) {
+			for (Attraction attr : attractions) {
+				futures.add(
+						CompletableFuture.runAsync(()-> {
+							if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
+
+								if(nearAttraction(visitedLocation, attr)) {
+									user.addUserReward(new UserReward(visitedLocation, attr, getRewardPoints(attr, user)));
+								}
+							}
+						},executorService)
+				);
+			}
+		}
+
+		futures.forEach((n)-> {
+			try {
+				n.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		});
+
+		return user.getUserName();
+	}
+
 	public void calculateRewardsAllUsers() {
 		List<User> allUsers = userService.getAllUsers();
 

@@ -46,7 +46,7 @@ public class TestPerformance {
 	 *          assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
 
-	private static final int NUMBER_OF_TEST_USERS = 1000;
+	private static final int NUMBER_OF_TEST_USERS = 100000;
 	
 	@Ignore
 	@Test
@@ -151,7 +151,7 @@ public class TestPerformance {
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 
-	//@Ignore
+	@Ignore
 	@Test
 	public void highVolumeGetRewardsCallConc() {
 		GpsService gpsService = new GpsService(new GpsUtil());
@@ -159,8 +159,7 @@ public class TestPerformance {
 		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(100);
-		//InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
+		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, userService);
@@ -231,7 +230,7 @@ public class TestPerformance {
 		System.out.println("Done Adding Locations");
 		System.out.println("Starting Calculating Rewards");
 
-		rewardsService.calculateRewardsAllUsers();
+		tourGuideService.processAllUserRewards();
 
 		System.out.println("Done Calculating Rewards");
 		System.out.println("Starting Asserting");

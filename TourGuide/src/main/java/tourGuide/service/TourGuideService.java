@@ -154,6 +154,36 @@ public class TourGuideService {
 
 	}
 
+	public void processAllUserRewards() {
+
+
+		List<User> allUsers = userService.getAllUsers();
+
+		ArrayList<CompletableFuture> futures = new ArrayList<>();
+
+		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+		allUsers.forEach((n)-> {
+			futures.add(
+					CompletableFuture.supplyAsync(()-> {
+								return rewardsService.calculateRewardsReturn(n);
+							}, executorService)
+			);
+		});
+		System.out.println("Futures created: " + futures.size());
+		System.out.println("Getting futures...");
+		futures.forEach((n)-> {
+			try {
+				n.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		});
+		System.out.println("Done!");
+
+	}
+
 	public List<UserLocation> getAllCurrentLocations() {
 		return userService.getAllCurrentLocations();
 	}
