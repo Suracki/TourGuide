@@ -33,7 +33,7 @@ public class TestTourGuideService {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);
 		UserService userService = new UserService();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 		
@@ -48,7 +48,7 @@ public class TestTourGuideService {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);
 		UserService userService = new UserService();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 		
@@ -72,7 +72,7 @@ public class TestTourGuideService {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);
 		UserService userService = new UserService();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 		
@@ -95,7 +95,7 @@ public class TestTourGuideService {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);
 		UserService userService = new UserService();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 
@@ -129,7 +129,7 @@ public class TestTourGuideService {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);
 		UserService userService = new UserService();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 		
@@ -147,7 +147,7 @@ public class TestTourGuideService {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);
 		UserService userService = new UserService();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 		
@@ -166,7 +166,7 @@ public class TestTourGuideService {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);
 		UserService userService = new UserService();
-		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 		

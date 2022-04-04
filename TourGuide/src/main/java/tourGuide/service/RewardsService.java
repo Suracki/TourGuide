@@ -27,18 +27,19 @@ public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
 	// proximity in miles
-    private int defaultProximityBuffer = 10;
+    private int defaultProximityBuffer = 100;
 	private int proximityBuffer = defaultProximityBuffer;
 	private int attractionProximityRange = 200;
-	private final GpsUtil gpsUtil;
+	private final GpsService gpsService;
 	private final RewardCentral rewardsCentral;
 	private final UserService userService;
 
 	//new
 	private CopyOnWriteArrayList<PendingReward> pendingRewards;
+	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
-	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral, UserService userService) {
-		this.gpsUtil = gpsUtil;
+	public RewardsService(GpsService gpsService, RewardCentral rewardCentral, UserService userService) {
+		this.gpsService = gpsService;
 		this.rewardsCentral = rewardCentral;
 		this.userService = userService;
 		pendingRewards = new CopyOnWriteArrayList<>();
@@ -55,7 +56,7 @@ public class RewardsService {
 	public void calculateRewardsOld(User user) {
 
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
-		List<Attraction> attractions = gpsUtil.getAttractions();
+		List<Attraction> attractions = gpsService.getAttractions();
 		
 		for(VisitedLocation visitedLocation : userLocations) {
 			for(Attraction attraction : attractions) {
@@ -102,7 +103,7 @@ public class RewardsService {
 
 	public void calculateRewardsOldest(User user) {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
-		List<Attraction> attractions = gpsUtil.getAttractions();
+		List<Attraction> attractions = gpsService.getAttractions();
 
 
 		ExecutorService locationExecutorService = Executors.newFixedThreadPool(userLocations.size());
@@ -126,9 +127,9 @@ public class RewardsService {
 
 	}
 
-	public void calculateRewards(User user) {
+	public void calculateRewardsSubs(User user) {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
-		List<Attraction> attractions = gpsUtil.getAttractions();
+		List<Attraction> attractions = gpsService.getAttractions();
 
 
 		ExecutorService locationExecutorService = Executors.newFixedThreadPool(userLocations.size());
@@ -148,13 +149,120 @@ public class RewardsService {
 
 	}
 
+	public void calculateRewards(User user) {
+
+		List<VisitedLocation> userLocations = user.getVisitedLocations();
+		List<Attraction> attractions = gpsService.getAttractions();
+
+		ArrayList<CompletableFuture> futures = new ArrayList<>();
+
+		for(VisitedLocation visitedLocation : userLocations) {
+			for (Attraction attr : attractions) {
+				futures.add(
+						CompletableFuture.runAsync(()-> {
+							if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
+
+								if(nearAttraction(visitedLocation, attr)) {
+									user.addUserReward(new UserReward(visitedLocation, attr, getRewardPoints(attr, user)));
+								}
+							}
+						},executorService)
+				);
+			}
+		}
+
+		futures.forEach((n)-> {
+			try {
+				n.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		});
+		//System.out.println("Rewards Done!");
+	}
+
+	public void calculateRewardsAllUsers() {
+		List<User> allUsers = userService.getAllUsers();
+
+
+		List<Attraction> attractions = gpsService.getAttractions();
+
+		ArrayList<CompletableFuture> futures = new ArrayList<>();
+
+		for (User user : allUsers) {
+			List<VisitedLocation> userLocations = user.getVisitedLocations();
+			for(VisitedLocation visitedLocation : userLocations) {
+				for (Attraction attr : attractions) {
+					futures.add(
+							CompletableFuture.runAsync(()-> {
+								if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
+									if(nearAttraction(visitedLocation, attr)) {
+										user.addUserReward(new UserReward(visitedLocation, attr, getRewardPoints(attr, user)));
+									}
+								}
+							},executorService)
+					);
+				}
+			}
+		}
+
+
+		System.out.println(allUsers.size() + "Users Found");
+		System.out.println(futures.size() + "Futures Created");
+
+		futures.forEach((n)-> {
+			try {
+				n.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		});
+
+		System.out.println("Futures done");
+
+	}
+
+	public void calculateRewardsAllUsersError() {
+		List<User> allUsers = userService.getAllUsers();
+
+		ArrayList<CompletableFuture> futures = new ArrayList<>();
+
+		for(User user : allUsers) {
+			futures.add(
+					CompletableFuture.runAsync(()-> {
+						calculateRewards(user);
+					},executorService)
+			);
+		}
+		System.out.println(allUsers.size() + "Users Found");
+		System.out.println(futures.size() + "Futures Created");
+
+		futures.forEach((n)-> {
+			try {
+				n.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		});
+
+		System.out.println("Futures done");
+
+	}
+
 	public void processPendingRewards() {
+		System.out.println("pendingRewards size: " + pendingRewards.size());
 		if (pendingRewards.size() != 0) {
-			int processed = 0;
-			int toProcess = pendingRewards.size();
+
 			CopyOnWriteArrayList<PendingReward> processingRewards = new CopyOnWriteArrayList<>(pendingRewards);
 			pendingRewards = new CopyOnWriteArrayList<>();
 
+			System.out.println("processingRewards size: " + processingRewards.size());
 			List<CompletableFuture<Void>> completableFutures = new ArrayList<>();
 			for (PendingReward pendingReward : processingRewards) {
 				completableFutures.add(CompletableFuture.runAsync(
@@ -166,9 +274,19 @@ public class RewardsService {
 
 				));
 			}
+			System.out.println("completableFutures size: " + completableFutures.size());
 			CompletableFuture<Void> runFutures = CompletableFuture.allOf(
 					completableFutures.toArray(new CompletableFuture[]{}));
-			//runFutures.get();
+			System.out.println("runFutures Created");
+			try {
+				System.out.println("runFutures getting...");
+				runFutures.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			System.out.println("runFutures done");
 		}
 	}
 }

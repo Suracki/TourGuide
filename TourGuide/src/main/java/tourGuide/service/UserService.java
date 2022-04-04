@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.outputEntities.UserLocation;
 import tourGuide.user.User;
-import tourGuide.user.UserReward;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,74 +18,64 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
-    private ConcurrentMap<UUID, User> usersByUuid;
+    private ConcurrentMap<String, User> usersByName;
 
     public UserService() {
         final int CAPACITY = 100;
-        usersByUuid = new ConcurrentHashMap<UUID, User>(CAPACITY);
+        usersByName = new ConcurrentHashMap<String, User>(CAPACITY);
     }
 
     public UserService(List<User> startingUsers) {
         for (User user : startingUsers){
-            usersByUuid.put(user.getUserId(), user);
+            usersByName.put(user.getUserName(), user);
         }
     }
 
     public int addUsers(List<User> startingUsers) {
         for (User user : startingUsers){
-            if(!usersByUuid.containsKey(user.getUserId())) {
-                usersByUuid.put(user.getUserId(), user);
+            if(!usersByName.containsKey(user.getUserName())) {
+                usersByName.put(user.getUserName(), user);
             }
         }
-        return usersByUuid.size();
+        return usersByName.size();
     }
 
     public void addUser(User user){
-        if(!usersByUuid.containsKey(user.getUserId())) {
-            usersByUuid.put(user.getUserId(), user);
+        if(!usersByName.containsKey(user.getUserName())) {
+            usersByName.put(user.getUserName(), user);
         }
     }
 
-    public User getUserByUuid(UUID uuid) {
-        return usersByUuid.get(uuid);
+    public String addToVisitedLocationsThread(VisitedLocation visitedLocation, String userName) {
+        new Thread( ()-> {
+            usersByName.get(userName).addToVisitedLocations(visitedLocation);
+        }).start();
+        return userName;
     }
 
-    public UUID addToVisitedLocations(VisitedLocation visitedLocation, UUID userId) {
-        new Thread( ()-> {
-            usersByUuid.get(userId).addToVisitedLocations(visitedLocation);
-        }).start();
-        return userId;
+    public String addToVisitedLocations(VisitedLocation visitedLocation, String userName) {
+        usersByName.get(userName).addToVisitedLocations(visitedLocation);
+        return userName;
     }
 
     public List<UserLocation> getAllCurrentLocations() {
         List<UserLocation> userLocations = new ArrayList<>();
-        usersByUuid.forEach((k,v)-> {
-            userLocations.add(new UserLocation(k, v.getLastVisitedLocation()));
+        usersByName.forEach((k,v)-> {
+            userLocations.add(new UserLocation(v.getUserId(), v.getLastVisitedLocation()));
         });
         return userLocations;
     }
 
-    public void addUserReward(UUID userId, VisitedLocation visitedLocation, Attraction attraction) {
+    public void addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction) {
         System.out.println("ADDING REWARD?");
         //user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
     }
 
     public List<User> getAllUsers() {
-        return usersByUuid.values().stream().collect(Collectors.toList());
+        return usersByName.values().stream().collect(Collectors.toList());
     }
 
     public User getUserByUsername(String userName) {
-        User[] user = new User[1];
-        usersByUuid.forEach((k,v)-> {
-            if (v.getUserName().equals(userName)) {
-                user[0] = v;
-            }
-        });
-        if (user.length == 0) {
-            return null;
-        }
-        else {
-            return user[0];
-        }
+        return usersByName.get(userName);
     }
 }

@@ -35,7 +35,8 @@ public class TourGuideService {
 	public final Tracker tracker;
 	boolean testMode = true;
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
-	
+
+
 	public TourGuideService(GpsService gpsService, RewardsService rewardsService, UserService userService) {
 		this.gpsService = gpsService;
 		this.rewardsService = rewardsService;
@@ -87,11 +88,70 @@ public class TourGuideService {
 		VisitedLocation visitedLocation = gpsService.getUserLocation(user.getUserId());
 
 		CompletableFuture.supplyAsync(()-> {
-			return userService.addToVisitedLocations(visitedLocation, user.getUserId());
+			return userService.addToVisitedLocations(visitedLocation, user.getUserName());
 		}, executorService)
 				.thenAccept(n -> {rewardsService.calculateRewards(user);});
 
 		return visitedLocation;
+	}
+
+	public void trackAllUserLocations() {
+		List<User> allUsers = userService.getAllUsers();
+
+		ArrayList<Thread> threads = new ArrayList<>();
+
+		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+		allUsers.forEach((n)-> {
+			threads.add(
+					new Thread( ()-> {
+						userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+					})
+					);
+		});
+		System.out.println("Thread array size: " + threads.size());
+		System.out.println("Starting threads...");
+		threads.forEach((n)->n.start());
+		System.out.println("Joining threads...");
+		threads.forEach((n)-> {
+			try {
+				n.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		System.out.println("Done!");
+
+	}
+
+	public void trackAllUserLocationsAndProcess() {
+
+
+		List<User> allUsers = userService.getAllUsers();
+
+		ArrayList<CompletableFuture> futures = new ArrayList<>();
+
+		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+		allUsers.forEach((n)-> {
+			futures.add(
+			CompletableFuture.supplyAsync(()-> {
+						return userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+					}, executorService)
+					.thenAccept(y -> {rewardsService.calculateRewards(n);})
+			);
+		});
+		System.out.println("Futures created: " + futures.size());
+		System.out.println("Getting futures...");
+		futures.forEach((n)-> {
+			try {
+				n.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		});
+		System.out.println("Done!");
+
 	}
 
 	public List<UserLocation> getAllCurrentLocations() {
