@@ -161,7 +161,8 @@ public class TestTourGuideService {
 		
 		assertEquals(5, minfiveattractions.size());
 	}
-	
+
+	@Test
 	public void getTripDeals() {
 		GpsUtil gpsUtil = new GpsUtil();
 		GpsService gpsService = new GpsService(gpsUtil);

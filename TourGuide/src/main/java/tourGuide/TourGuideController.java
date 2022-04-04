@@ -77,13 +77,4 @@ public class TourGuideController {
     	return tourGuideService.getUser(userName);
     }
 
-    @RequestMapping("/addUser")
-    public User addUser(@RequestParam String userName) {
-        System.out.println("Adding " + userName);
-        User user = new User(new UUID(1,2), userName, "number","email");
-        tourGuideService.addUser(user);
-        return user;
-    }
-   
-
 }

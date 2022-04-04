@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.outputEntities.UserLocation;
 import tourGuide.user.User;
+import tourGuide.user.UserReward;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +47,6 @@ public class UserService {
         }
     }
 
-    public String addToVisitedLocationsThread(VisitedLocation visitedLocation, String userName) {
-        new Thread( ()-> {
-            usersByName.get(userName).addToVisitedLocations(visitedLocation);
-        }).start();
-        return userName;
-    }
-
     public String addToVisitedLocations(VisitedLocation visitedLocation, String userName) {
         usersByName.get(userName).addToVisitedLocations(visitedLocation);
         return userName;
@@ -66,9 +60,9 @@ public class UserService {
         return userLocations;
     }
 
-    public void addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction) {
-        System.out.println("ADDING REWARD?");
-        //user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
+    public void addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
+        User user = getUserByUsername(userName);
+        user.addUserReward(new UserReward(visitedLocation, attraction, rewardPoints));
     }
 
     public List<User> getAllUsers() {

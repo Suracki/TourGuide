@@ -293,19 +293,3 @@ public class TourGuideService {
 	}
 	
 }
-
-//class CalcRewards extends Thread {
-//	private User user;
-//	private RewardsService rewardsService;
-//	private VisitedLocation visitedLocation;
-//	public CalcRewards(User user, RewardsService rewardsService, VisitedLocation visitedLocation) {
-//		this.user = user;
-//		this.rewardsService = rewardsService;
-//		this.visitedLocation = visitedLocation;
-//	}
-//	@Override
-//	public void run() {
-//		user.addToVisitedLocations(visitedLocation);
-//		rewardsService.calculateRewardsFutures(user);
-//	}
-//}
