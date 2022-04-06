@@ -243,7 +243,7 @@ public class TourGuideService {
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() { 
 		      public void run() {
-		        tracker.stopTracking();
+		        executorService.shutdown();tracker.stopTracking();
 		      } 
 		    }); 
 	}

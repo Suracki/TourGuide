@@ -12,7 +12,6 @@ import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.user.User;
-import tourGuide.user.UserReward;
 
 
 @Service
@@ -52,8 +51,8 @@ public class RewardsService {
 		return getDistance(attraction, visitedLocation.location) > proximityBuffer ? false : true;
 	}
 	
-	private int getRewardPoints(Attraction attraction, User user) {
-		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+	private int getRewardPoints(Attraction attraction, UUID userid) {
+		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, userid);
 	}
 
 	public int getRewardValue(Attraction attraction, UUID userid) {
@@ -88,7 +87,7 @@ public class RewardsService {
 							if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
 
 								if(nearAttraction(visitedLocation, attr)) {
-									user.addUserReward(new UserReward(visitedLocation, attr, getRewardPoints(attr, user)));
+									userService.addUserReward(user.getUserName(), visitedLocation, attr, getRewardPoints(attr, user.getUserId()));
 								}
 							}
 						},executorService)
@@ -121,7 +120,7 @@ public class RewardsService {
 							if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
 
 								if(nearAttraction(visitedLocation, attr)) {
-									user.addUserReward(new UserReward(visitedLocation, attr, getRewardPoints(attr, user)));
+									userService.addUserReward(user.getUserName(), visitedLocation, attr, getRewardPoints(attr, user.getUserId()));
 								}
 							}
 						},executorService)
