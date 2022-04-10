@@ -19,8 +19,8 @@ import tourGuide.helper.InternalTestHelper;
 import tourGuide.service.GpsService;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
-import tourGuide.service.UserService;
-import tourGuide.user.User;
+import userDocker.service.UserService;
+import userDocker.model.User;
 
 
 public class TestPerformance {

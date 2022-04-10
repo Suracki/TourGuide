@@ -8,8 +8,7 @@ import gpsUtil.GpsUtil;
 import rewardCentral.RewardCentral;
 import tourGuide.service.GpsService;
 import tourGuide.service.RewardsService;
-import tourGuide.service.UserService;
-import tourGuide.user.User;
+import userDocker.service.UserService;
 
 @Configuration
 public class TourGuideModule {

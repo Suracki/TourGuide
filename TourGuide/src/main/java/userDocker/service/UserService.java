@@ -1,4 +1,4 @@
-package tourGuide.service;
+package userDocker.service;
 
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
@@ -6,12 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.outputEntities.UserLocation;
-import tourGuide.user.User;
-import tourGuide.user.UserReward;
+import userDocker.model.User;
+import userDocker.model.UserReward;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -41,10 +40,13 @@ public class UserService {
         return usersByName.size();
     }
 
-    public void addUser(User user){
+    public boolean addUser(User user){
         if(!usersByName.containsKey(user.getUserName())) {
             usersByName.put(user.getUserName(), user);
+            System.out.println(usersByName.size());
+            return true;
         }
+        return false;
     }
 
     public String addToVisitedLocations(VisitedLocation visitedLocation, String userName) {
@@ -72,4 +74,13 @@ public class UserService {
     public User getUserByUsername(String userName) {
         return usersByName.get(userName);
     }
+
+    public VisitedLocation getLastVisitedLocationByName(String userName) {
+        return getUserByUsername(userName).getLastVisitedLocation();
+    }
+
+    public List<UserReward> getUserRewardsByUsername(String userName){
+        return getUserByUsername(userName).getUserRewards();
+    }
+
 }

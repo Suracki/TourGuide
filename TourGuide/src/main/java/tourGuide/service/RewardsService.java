@@ -11,7 +11,8 @@ import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
-import tourGuide.user.User;
+import userDocker.service.UserService;
+import userDocker.model.User;
 
 
 @Service

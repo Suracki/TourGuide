@@ -17,9 +17,9 @@ import tourGuide.helper.InternalTestHelper;
 import tourGuide.service.GpsService;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
-import tourGuide.service.UserService;
-import tourGuide.user.User;
-import tourGuide.user.UserReward;
+import userDocker.service.UserService;
+import userDocker.model.User;
+import userDocker.model.UserReward;
 
 public class TestRewardsService {
 
@@ -64,7 +64,7 @@ public class TestRewardsService {
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, new UserService());
 		
 		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
-		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0));
+		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0).getUserName());
 		tourGuideService.tracker.stopTracking();
 
 		assertEquals(gpsUtil.getAttractions().size(), userRewards.size());

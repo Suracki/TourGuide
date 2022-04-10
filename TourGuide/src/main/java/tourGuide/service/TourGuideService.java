@@ -4,24 +4,22 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.jsoniter.output.JsonStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import userDocker.service.UserService;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.outputEntities.NearbyAttraction;
 import tourGuide.outputEntities.UserLocation;
 import tourGuide.tracker.Tracker;
-import tourGuide.user.User;
-import tourGuide.user.UserReward;
+import userDocker.model.User;
+import userDocker.model.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
@@ -52,14 +50,14 @@ public class TourGuideService {
 		addShutDownHook();
 	}
 	
-	public List<UserReward> getUserRewards(User user) {
-		return user.getUserRewards();
+	public List<UserReward> getUserRewards(String userName) {
+		return userService.getUserRewardsByUsername(userName);
 	}
 	
-	public VisitedLocation getUserLocation(User user) {
-		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ?
-			user.getLastVisitedLocation() :
-			trackUserLocation(user);
+	public VisitedLocation getUserLocation(String userName) {
+		VisitedLocation visitedLocation = ((userService.getUserByUsername(userName)).getVisitedLocations().size() > 0) ?
+				userService.getLastVisitedLocationByName(userName) :
+				trackUserLocation(userService.getUserByUsername(userName));
 		return visitedLocation;
 	}
 	
@@ -71,11 +69,13 @@ public class TourGuideService {
 		return userService.getAllUsers();
 	}
 	
-	public void addUser(User user) {
-		userService.addUser(user);
-	}
+	//public void addUser(User user) {
+	//	userService.addUser(user);
+	//}
 	
-	public List<Provider> getTripDeals(User user) {
+	public List<Provider> getTripDeals(String userName) {
+		User user = userService.getUserByUsername(userName);
+
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
 				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
