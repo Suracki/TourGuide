@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.outputEntities.UserLocation;
-import tourGuide.service.GpsService;
-import tourGuide.service.TourGuideService;
+import gpsDocker.service.GpsService;
+import tourGuide.remote.GpsRemote;
 import userDocker.model.User;
 import userDocker.model.UserReward;
 
@@ -23,19 +23,19 @@ import java.util.stream.Collectors;
 public class UserService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
     private ConcurrentMap<String, User> usersByName;
-    //@TODO - move to constructor
-    private final GpsService gpsService = new GpsService(new GpsUtil());
+    private final GpsRemote gpsRemote;
 
-    public UserService() {
+    public UserService(GpsRemote gpsRemote) {
+        this.gpsRemote = gpsRemote;
         final int CAPACITY = 100;
         usersByName = new ConcurrentHashMap<String, User>(CAPACITY);
     }
 
-    public UserService(List<User> startingUsers) {
-        for (User user : startingUsers){
-            usersByName.put(user.getUserName(), user);
-        }
-    }
+//    public UserService(List<User> startingUsers) {
+//        for (User user : startingUsers){
+//            usersByName.put(user.getUserName(), user);
+//        }
+//    }
 
     public int addUsers(List<User> startingUsers) {
         for (User user : startingUsers){
@@ -107,7 +107,7 @@ public class UserService {
         allUsers.forEach((n)-> {
             threads.add(
                     new Thread( ()-> {
-                        addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+                        addToVisitedLocations(gpsRemote.getUserLocation(n.getUserId()), n.getUserName());
                     })
             );
         });

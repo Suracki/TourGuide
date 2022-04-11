@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 import gpsUtil.GpsUtil;
 import rewardCentral.RewardCentral;
-import tourGuide.service.GpsService;
-import tourGuide.service.RewardsService;
+import gpsDocker.service.GpsService;
+import rewardsDocker.service.RewardsService;
 import userDocker.service.UserService;
 
 @Configuration
