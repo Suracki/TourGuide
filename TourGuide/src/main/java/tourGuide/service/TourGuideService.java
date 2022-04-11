@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import tourGuide.remote.UserRemote;
 import userDocker.service.UserService;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.outputEntities.NearbyAttraction;
@@ -28,17 +29,17 @@ public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsService gpsService;
 	private final RewardsService rewardsService;
-	private final UserService userService;
+	private final UserRemote userRemote;
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
 
-	public TourGuideService(GpsService gpsService, RewardsService rewardsService, UserService userService) {
+	public TourGuideService(GpsService gpsService, RewardsService rewardsService, UserRemote userRemote) {
 		this.gpsService = gpsService;
 		this.rewardsService = rewardsService;
-		this.userService = userService;
+		this.userRemote = userRemote;
 		
 		if(testMode) {
 			logger.info("TestMode enabled");
@@ -51,22 +52,22 @@ public class TourGuideService {
 	}
 	
 	public List<UserReward> getUserRewards(String userName) {
-		return userService.getUserRewardsByUsername(userName);
+		return userRemote.getUserRewardsByUsername(userName);
 	}
 	
 	public VisitedLocation getUserLocation(String userName) {
-		VisitedLocation visitedLocation = ((userService.getUserByUsername(userName)).getVisitedLocations().size() > 0) ?
-				userService.getLastVisitedLocationByName(userName) :
-				trackUserLocation(userService.getUserByUsername(userName));
+		VisitedLocation visitedLocation = (userRemote.getVisitedLocationsByUsername(userName).size() > 0) ?
+				userRemote.getLastVisitedLocationByName(userName) :
+				trackUserLocationByName(userName);
 		return visitedLocation;
 	}
 	
 	public User getUser(String userName) {
-		return userService.getUserByUsername(userName);
+		return userRemote.getUserByUsername(userName);
 	}
 	
 	public List<User> getAllUsers() {
-		return userService.getAllUsers();
+		return userRemote.getAllUsers();
 	}
 	
 	//public void addUser(User user) {
@@ -74,7 +75,7 @@ public class TourGuideService {
 	//}
 	
 	public List<Provider> getTripDeals(String userName) {
-		User user = userService.getUserByUsername(userName);
+		User user = userRemote.getUserByUsername(userName);
 
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
@@ -83,12 +84,24 @@ public class TourGuideService {
 		return providers;
 	}
 
+	public VisitedLocation trackUserLocationByName(String userName) {
+
+		VisitedLocation visitedLocation = gpsService.getUserLocation(userRemote.getUserIdByUsername(userName));
+
+		CompletableFuture.supplyAsync(()-> {
+					return userRemote.addToVisitedLocations(visitedLocation, userName);
+				}, executorService)
+				.thenAccept(n -> {rewardsService.calculateRewardsByUsername(userName);});
+
+		return visitedLocation;
+	}
+
 	public VisitedLocation trackUserLocation(User user) {
 
 		VisitedLocation visitedLocation = gpsService.getUserLocation(user.getUserId());
 
 		CompletableFuture.supplyAsync(()-> {
-			return userService.addToVisitedLocations(visitedLocation, user.getUserName());
+			return userRemote.addToVisitedLocations(visitedLocation, user.getUserName());
 		}, executorService)
 				.thenAccept(n -> {rewardsService.calculateRewards(user);});
 
@@ -96,37 +109,34 @@ public class TourGuideService {
 	}
 
 	public void trackAllUserLocations() {
-		List<User> allUsers = userService.getAllUsers();
-
-		ArrayList<Thread> threads = new ArrayList<>();
-
-		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
-		allUsers.forEach((n)-> {
-			threads.add(
-					new Thread( ()-> {
-						userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
-					})
-					);
-		});
-		System.out.println("Thread array size: " + threads.size());
-		System.out.println("Starting threads...");
-		threads.forEach((n)->n.start());
-		System.out.println("Joining threads...");
-		threads.forEach((n)-> {
-			try {
-				n.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
-		System.out.println("Done!");
+		userRemote.trackAllUserLocations();
+//		List<User> allUsers = userRemote.getAllUsers();
+//
+//		ArrayList<Thread> threads = new ArrayList<>();
+//
+//		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+//		allUsers.forEach((n)-> {
+//			threads.add(
+//					new Thread( ()-> {
+//						userRemote.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+//					})
+//					);
+//		});
+//		threads.forEach((n)->n.start());
+//		threads.forEach((n)-> {
+//			try {
+//				n.join();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		});
 
 	}
 
 	public void trackAllUserLocationsAndProcess() {
 
 
-		List<User> allUsers = userService.getAllUsers();
+		List<User> allUsers = userRemote.getAllUsers();
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
@@ -134,7 +144,7 @@ public class TourGuideService {
 		allUsers.forEach((n)-> {
 			futures.add(
 			CompletableFuture.supplyAsync(()-> {
-						return userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+						return userRemote.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
 					}, executorService)
 					.thenAccept(y -> {rewardsService.calculateRewards(n);})
 			);
@@ -157,7 +167,7 @@ public class TourGuideService {
 	public void processAllUserRewards() {
 
 
-		List<User> allUsers = userService.getAllUsers();
+		List<User> allUsers = userRemote.getAllUsers();
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
@@ -185,7 +195,7 @@ public class TourGuideService {
 	}
 
 	public List<UserLocation> getAllCurrentLocations() {
-		return userService.getAllCurrentLocations();
+		return userRemote.getAllCurrentLocations();
 	}
 
 	//Returns 5 nearest attractions
@@ -264,7 +274,7 @@ public class TourGuideService {
 			User user = new User(UUID.randomUUID(), userName, phone, email);
 			generateUserLocationHistory(user);
 
-			userService.addUser(user);
+			userRemote.addUser(user);
 		});
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 	}

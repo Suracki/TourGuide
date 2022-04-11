@@ -1,16 +1,20 @@
 package userDocker.service;
 
+import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.outputEntities.UserLocation;
+import tourGuide.service.GpsService;
+import tourGuide.service.TourGuideService;
 import userDocker.model.User;
 import userDocker.model.UserReward;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -19,6 +23,8 @@ import java.util.stream.Collectors;
 public class UserService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
     private ConcurrentMap<String, User> usersByName;
+    //@TODO - move to constructor
+    private final GpsService gpsService = new GpsService(new GpsUtil());
 
     public UserService() {
         final int CAPACITY = 100;
@@ -43,7 +49,6 @@ public class UserService {
     public boolean addUser(User user){
         if(!usersByName.containsKey(user.getUserName())) {
             usersByName.put(user.getUserName(), user);
-            System.out.println(usersByName.size());
             return true;
         }
         return false;
@@ -79,8 +84,42 @@ public class UserService {
         return getUserByUsername(userName).getLastVisitedLocation();
     }
 
+    public List<VisitedLocation> getVisitedLocationsByUsername(String userName) {
+        return getUserByUsername(userName).getVisitedLocations();
+    }
+
     public List<UserReward> getUserRewardsByUsername(String userName){
         return getUserByUsername(userName).getUserRewards();
     }
 
+    public UUID getUserIdByUsername(String userName) {
+        return getUserByUsername(userName).getUserId();
+    }
+
+    public void trackAllUserLocations() {
+        System.out.println("trackAllUserLocations method call");
+
+        List<User> allUsers = getAllUsers();
+
+        ArrayList<Thread> threads = new ArrayList<>();
+
+        System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+        allUsers.forEach((n)-> {
+            threads.add(
+                    new Thread( ()-> {
+                        addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+                    })
+            );
+        });
+        System.out.println("Threads created: " + threads.size() + ", running...");
+        threads.forEach((n)->n.start());
+        threads.forEach((n)-> {
+            try {
+                n.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        System.out.println("DONE");
+    }
 }

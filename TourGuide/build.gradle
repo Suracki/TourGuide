@@ -32,6 +32,11 @@ targetCompatibility = 1.8
 
 dependencies {
     implementation group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.0.1'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.3'
+
+
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile group: 'org.javamoney', name: 'moneta', version: '1.3'

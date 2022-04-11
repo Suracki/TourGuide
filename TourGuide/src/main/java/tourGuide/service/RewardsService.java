@@ -11,6 +11,7 @@ import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
+import tourGuide.remote.UserRemote;
 import userDocker.service.UserService;
 import userDocker.model.User;
 
@@ -26,6 +27,7 @@ public class RewardsService {
 	private final GpsService gpsService;
 	private final RewardCentral rewardsCentral;
 	private final UserService userService;
+	private final UserRemote userRemote;
 
 	//new
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
@@ -34,6 +36,7 @@ public class RewardsService {
 		this.gpsService = gpsService;
 		this.rewardsCentral = rewardCentral;
 		this.userService = userService;
+		userRemote = new UserRemote(userService);
 	}
 	
 	public void setProximityBuffer(int proximityBuffer) {
@@ -75,8 +78,12 @@ public class RewardsService {
 	}
 
 	public void calculateRewards(User user) {
+		System.out.println("Name: " + user.getUserName());
+		System.out.println("Before Calc: " + user.getUserRewards().size());
+
 
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
+		System.out.println("Before user visited locations: " + userLocations.size());
 		List<Attraction> attractions = gpsService.getAttractions();
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
@@ -96,6 +103,8 @@ public class RewardsService {
 			}
 		}
 
+		System.out.println("user visited locations: " + userLocations.size());
+
 		futures.forEach((n)-> {
 			try {
 				n.get();
@@ -105,6 +114,8 @@ public class RewardsService {
 				e.printStackTrace();
 			}
 		});
+
+		System.out.println("After Calc: " + user.getUserRewards().size());
 	}
 
 	public String calculateRewardsReturn(User user) {
@@ -140,5 +151,41 @@ public class RewardsService {
 		});
 
 		return user.getUserName();
+	}
+
+	public String calculateRewardsByUsername(String userName) {
+
+		List<VisitedLocation> userLocations = userRemote.getVisitedLocationsByUsername(userName);
+		List<Attraction> attractions = gpsService.getAttractions();
+		UUID userID = userRemote.getUserIdByUsername(userName);
+
+		CopyOnWriteArrayList<CompletableFuture> futures = new CopyOnWriteArrayList<>();
+
+		for(VisitedLocation visitedLocation : userLocations) {
+			for (Attraction attr : attractions) {
+				futures.add(
+						CompletableFuture.runAsync(()-> {
+							if(userRemote.getUserRewardsByUsername(userName).stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
+
+								if(nearAttraction(visitedLocation, attr)) {
+									userService.addUserReward(userName, visitedLocation, attr, getRewardPoints(attr, userID));
+								}
+							}
+						},executorService)
+				);
+			}
+		}
+
+		futures.forEach((n)-> {
+			try {
+				n.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		});
+
+		return userName;
 	}
 }

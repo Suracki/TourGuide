@@ -19,6 +19,7 @@ public class User {
 	private List<UserReward> userRewards = new CopyOnWriteArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
+
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
 		this.userId = userId;
 		this.userName = userName;
@@ -71,8 +72,26 @@ public class User {
 	}
 	
 	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction.attractionName)).count() == 0) {
+//		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction.attractionName)).count() == 0) {
+//			userRewards.add(userReward);
+//			System.out.println("Adding: " + userReward.attraction.attractionName);
+//		}
+//		else {
+//			System.out.println("Already found " + userReward.attraction.attractionName);
+//		}
+
+		boolean found = false;
+		for (UserReward reward : userRewards) {
+			if (reward.attraction.attractionName.equals(userReward.attraction.attractionName)) {
+				found = true;
+			}
+		}
+		if (found) {
+			//System.out.println("Already found " + userReward.attraction.attractionName);
+		}
+		else {
 			userRewards.add(userReward);
+			System.out.println("Adding: " + userReward.attraction.attractionName);
 		}
 	}
 	
