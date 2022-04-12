@@ -17,6 +17,7 @@ import tourGuide.helper.InternalTestHelper;
 import tourGuide.outputEntities.NearbyAttraction;
 import tourGuide.outputEntities.UserLocation;
 import tourGuide.remote.GpsRemote;
+import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
 import gpsDocker.service.GpsService;
 import rewardsDocker.service.RewardsService;
@@ -29,14 +30,11 @@ public class TestTourGuideService {
 
 	@Test
 	public void trackUserLocation() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
@@ -46,14 +44,11 @@ public class TestTourGuideService {
 
 	@Test
 	public void getUserLocation() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		userRemote.addUser(user);
 		VisitedLocation visitedLocation = tourGuideService.getUserLocation(user.getUserName());
@@ -63,20 +58,17 @@ public class TestTourGuideService {
 	
 	@Test
 	public void addUser() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		User user2 = new User(UUID.randomUUID(), "jon2", "000", "jon2@tourGuide.com");
 
-		userService.addUser(user);
-		userService.addUser(user2);
+		userRemote.addUser(user);
+		userRemote.addUser(user2);
 		
 		User retrivedUser = tourGuideService.getUser(user.getUserName());
 		User retrivedUser2 = tourGuideService.getUser(user2.getUserName());
@@ -89,20 +81,17 @@ public class TestTourGuideService {
 	
 	@Test
 	public void getAllUsers() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		User user2 = new User(UUID.randomUUID(), "jon2", "000", "jon2@tourGuide.com");
 
-		userService.addUser(user);
-		userService.addUser(user2);
+		userRemote.addUser(user);
+		userRemote.addUser(user2);
 		
 		List<User> allUsers = tourGuideService.getAllUsers();
 
@@ -114,20 +103,17 @@ public class TestTourGuideService {
 
 	@Test
 	public void getUser() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		User user2 = new User(UUID.randomUUID(), "jon2", "000", "jon2@tourGuide.com");
 
-		userService.addUser(user);
-		userService.addUser(user2);
+		userRemote.addUser(user);
+		userRemote.addUser(user2);
 
 		User getUser = tourGuideService.getUser("jon");
 
@@ -139,14 +125,11 @@ public class TestTourGuideService {
 
 	@Test
 	public void getAllUsersLocations() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocationOne = tourGuideService.trackUserLocation(user);
@@ -156,8 +139,8 @@ public class TestTourGuideService {
 		VisitedLocation visitedLocationTwo = tourGuideService.trackUserLocation(userTwo);
 		userTwo.addToVisitedLocations(visitedLocationTwo);
 
-		userService.addUser(user);
-		userService.addUser(userTwo);
+		userRemote.addUser(user);
+		userRemote.addUser(userTwo);
 
 		List<UserLocation> allUserLocations = tourGuideService.getAllCurrentLocations();
 
@@ -175,14 +158,11 @@ public class TestTourGuideService {
 	
 	@Test
 	public void trackUser() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
@@ -195,14 +175,11 @@ public class TestTourGuideService {
 	//@Ignore // Not yet implemented
 	@Test
 	public void getNearbyAttractions() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
@@ -217,17 +194,14 @@ public class TestTourGuideService {
 
 	@Test
 	public void getTripDeals() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-		userService.addUser(user);
+		userRemote.addUser(user);
 
 		List<Provider> providers = tourGuideService.getTripDeals(user.getUserName());
 		

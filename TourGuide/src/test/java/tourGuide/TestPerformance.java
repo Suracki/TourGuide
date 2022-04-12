@@ -17,6 +17,7 @@ import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.remote.GpsRemote;
+import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
 import gpsDocker.service.GpsService;
 import rewardsDocker.service.RewardsService;
@@ -51,15 +52,12 @@ public class TestPerformance {
 	
 	@Test
 	public void highVolumeTrackLocationConc() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -73,15 +71,12 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeTrackLocationAndProcessConc() {
-		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -96,24 +91,22 @@ public class TestPerformance {
 	@Ignore
 	@Test
 	public void highVolumeGetRewards() {
-		GpsService gpsService = new GpsService(new GpsUtil());
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
-	    Attraction attraction = gpsService.getAttractions().get(0);
+	    Attraction attraction = gpsRemote.getAttractions().get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-	    allUsers.forEach(u -> rewardsService.calculateRewardsByUsername(u.getUserName()));
+	    allUsers.forEach(u -> rewardsRemote.calculateRewardsByUsername(u.getUserName()));
 
 		for(User user : allUsers) {
 			assertTrue(user.getUserRewards().size() > 0);
@@ -129,19 +122,17 @@ public class TestPerformance {
 	@Ignore
 	@Test
 	public void highVolumeGetRewardsCallConc() {
-		GpsService gpsService = new GpsService(new GpsUtil());
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
-		Attraction attraction = gpsService.getAttractions().get(0);
+		Attraction attraction = gpsRemote.getAttractions().get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
@@ -155,7 +146,7 @@ public class TestPerformance {
 		for(User user : allUsers) {
 			futures.add(
 					CompletableFuture.runAsync(()-> {
-						rewardsService.calculateRewardsByUsername(user.getUserName());
+						rewardsRemote.calculateRewardsByUsername(user.getUserName());
 					},executorService)
 			);
 		}
@@ -188,24 +179,22 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewardsOneCall() {
-		GpsService gpsService = new GpsService(new GpsUtil());
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
+		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
 		System.out.println("Starting Adding Locations");
 
-		Attraction attraction = gpsService.getAttractions().get(0);
+		Attraction attraction = gpsRemote.getAttractions().get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
-		allUsers.forEach(u -> userService.addToVisitedLocations((new VisitedLocation(u.getUserId(), attraction, new Date())), u.getUserName()));
+		allUsers.forEach(u -> userRemote.addToVisitedLocations((new VisitedLocation(u.getUserId(), attraction, new Date())), u.getUserName()));
 		//allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
 		System.out.println("Done Adding Locations");
