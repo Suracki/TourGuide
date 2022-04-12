@@ -75,8 +75,8 @@ public class TestRewardsService {
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
 
 
-		rewardsService.calculateRewardsByUsername(tourGuideService.getAllUsers().get(0).getUserName());
-		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0).getUserName());
+		rewardsService.calculateRewardsByUsername(tourGuideService.getAllUserNames().get(0));
+		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUserNames().get(0));
 		tourGuideService.tracker.stopTracking();
 
 		assertEquals(gpsUtil.getAttractions().size(), userRewards.size());

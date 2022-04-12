@@ -88,94 +88,94 @@ public class TestPerformance {
 		assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 
-	@Ignore
-	@Test
-	public void highVolumeGetRewards() {
-		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
-		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
+//	@Ignore
+//	@Test
+//	public void highVolumeGetRewards() {
+//		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+//		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+//		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
+//
+//		// Users should be incremented up to 100,000, and test finishes within 20 minutes
+//		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
+//		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
+//
+//	    Attraction attraction = gpsRemote.getAttractions().get(0);
+//		List<User> allUsers = new ArrayList<>();
+//		allUsers = tourGuideService.getAllUsers();
+//		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
+//
+//	    allUsers.forEach(u -> rewardsRemote.calculateRewardsByUsername(u.getUserName()));
+//
+//		for(User user : allUsers) {
+//			assertTrue(user.getUserRewards().size() > 0);
+//		}
+//
+//		stopWatch.stop();
+//		tourGuideService.tracker.stopTracking();
+//
+//		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
+//		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
+//	}
 
-		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
-
-	    Attraction attraction = gpsRemote.getAttractions().get(0);
-		List<User> allUsers = new ArrayList<>();
-		allUsers = tourGuideService.getAllUsers();
-		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
-
-	    allUsers.forEach(u -> rewardsRemote.calculateRewardsByUsername(u.getUserName()));
-
-		for(User user : allUsers) {
-			assertTrue(user.getUserRewards().size() > 0);
-		}
-
-		stopWatch.stop();
-		tourGuideService.tracker.stopTracking();
-
-		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
-		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
-	}
-
-	@Ignore
-	@Test
-	public void highVolumeGetRewardsCallConc() {
-		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
-		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
-
-		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
-
-		Attraction attraction = gpsRemote.getAttractions().get(0);
-		List<User> allUsers = new ArrayList<>();
-		allUsers = tourGuideService.getAllUsers();
-		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
-
-		ArrayList<CompletableFuture> futures = new ArrayList<>();
-
-		System.out.println(allUsers.size() + "Users Found");
-
-		ExecutorService executorService = Executors.newFixedThreadPool(10000);
-
-		for(User user : allUsers) {
-			futures.add(
-					CompletableFuture.runAsync(()-> {
-						rewardsRemote.calculateRewardsByUsername(user.getUserName());
-					},executorService)
-			);
-		}
-
-		System.out.println(futures.size() + "Futures Created. Getting...");
-
-		futures.forEach((n)-> {
-			try {
-				n.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-		});
-
-		System.out.println("Futures Got");
-
-		for(User user : allUsers) {
-			assertTrue(user.getUserRewards().size() > 0);
-		}
-
-		stopWatch.stop();
-		executorService.shutdown();
-		tourGuideService.tracker.stopTracking();
-
-		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
-		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
-	}
+//	@Ignore
+//	@Test
+//	public void highVolumeGetRewardsCallConc() {
+//		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
+//		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+//		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
+//
+//		// Users should be incremented up to 100,000, and test finishes within 20 minutes
+//		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
+//		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
+//
+//		Attraction attraction = gpsRemote.getAttractions().get(0);
+//		List<User> allUsers = new ArrayList<>();
+//		allUsers = tourGuideService.getAllUsers();
+//		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
+//
+//		ArrayList<CompletableFuture> futures = new ArrayList<>();
+//
+//		System.out.println(allUsers.size() + "Users Found");
+//
+//		ExecutorService executorService = Executors.newFixedThreadPool(10000);
+//
+//		for(User user : allUsers) {
+//			futures.add(
+//					CompletableFuture.runAsync(()-> {
+//						rewardsRemote.calculateRewardsByUsername(user.getUserName());
+//					},executorService)
+//			);
+//		}
+//
+//		System.out.println(futures.size() + "Futures Created. Getting...");
+//
+//		futures.forEach((n)-> {
+//			try {
+//				n.get();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			} catch (ExecutionException e) {
+//				e.printStackTrace();
+//			}
+//		});
+//
+//		System.out.println("Futures Got");
+//
+//		for(User user : allUsers) {
+//			assertTrue(user.getUserRewards().size() > 0);
+//		}
+//
+//		stopWatch.stop();
+//		executorService.shutdown();
+//		tourGuideService.tracker.stopTracking();
+//
+//		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
+//		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
+//	}
 
 	@Test
 	public void highVolumeGetRewardsOneCall() {
@@ -192,15 +192,14 @@ public class TestPerformance {
 		System.out.println("Starting Adding Locations");
 
 		Attraction attraction = gpsRemote.getAttractions().get(0);
-		List<User> allUsers = new ArrayList<>();
-		allUsers = tourGuideService.getAllUsers();
+		List<User> allUsers = userRemote.getAllUsers();
 		allUsers.forEach(u -> userRemote.addToVisitedLocations((new VisitedLocation(u.getUserId(), attraction, new Date())), u.getUserName()));
-		//allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
 		System.out.println("Done Adding Locations");
 		System.out.println("Starting Calculating Rewards");
 
 		tourGuideService.processAllUserRewards();
+		allUsers = userRemote.getAllUsers();
 
 		System.out.println("Done Calculating Rewards");
 		System.out.println("Starting Asserting");

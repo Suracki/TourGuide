@@ -5,16 +5,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import tourGuide.outputEntities.UserLocation;
 import userDocker.gson.MoneyTypeAdapterFactory;
 import userDocker.model.User;
-import userDocker.model.UserReward;
 import userDocker.service.UserService;
 
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 public class UserServiceController {
@@ -54,17 +49,7 @@ public class UserServiceController {
     @RequestMapping("/getAllUsers")
     public String getAllUsers() {
         //List<User>
-        try {
-            String json = objectMapper.writeValueAsString(userService.getAllUsers());
-            System.out.println(json);
-            return json;
-        }
-        catch (Exception e) {
-            System.out.println("Exception: " + e);
-            return null;
-        }
-
-        //return gson.toJson(userService.getAllUsers());
+        return gson.toJson(userService.getAllUsers());
     }
 
     @GetMapping("/getUser")
@@ -101,5 +86,15 @@ public class UserServiceController {
     public void trackAllUserLocations() {
         System.out.println("trackAllUserLocations controller call");
         userService.trackAllUserLocations();
+    }
+
+    @GetMapping("getUserCount")
+    public String getUserCount() {
+        return gson.toJson(userService.getUserCount());
+    }
+
+    @GetMapping("getAllUserNames")
+    public String getAllUserNames() {
+        return gson.toJson(userService.getAllUserNames());
     }
 }

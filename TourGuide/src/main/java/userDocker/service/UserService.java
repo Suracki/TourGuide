@@ -116,4 +116,12 @@ public class UserService {
         });
         System.out.println("DONE");
     }
+
+    public int getUserCount() {
+        return usersByName.size();
+    }
+
+    public List<String> getAllUserNames() {
+        return usersByName.values().stream().map(User::getUserName).collect(Collectors.toList());
+    }
 }

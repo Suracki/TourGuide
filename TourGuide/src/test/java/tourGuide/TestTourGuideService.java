@@ -55,7 +55,8 @@ public class TestTourGuideService {
 		tourGuideService.tracker.stopTracking();
 		assertTrue(visitedLocation.userId.equals(user.getUserId()));
 	}
-	
+
+	//@TODO: improve asserts
 	@Test
 	public void addUser() {
 		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
@@ -75,14 +76,15 @@ public class TestTourGuideService {
 
 		tourGuideService.tracker.stopTracking();
 		
-		assertEquals(user, retrivedUser);
-		assertEquals(user2, retrivedUser2);
+		assertEquals(user.getUserName(), retrivedUser.getUserName());
+		assertEquals(user2.getUserName(), retrivedUser2.getUserName());
 	}
 	
 	@Test
 	public void getAllUsers() {
 		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
-		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
+		UserService userService = new UserService(gpsRemote);
+		UserRemote userRemote = new UserRemote(userService);
 		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
@@ -93,7 +95,7 @@ public class TestTourGuideService {
 		userRemote.addUser(user);
 		userRemote.addUser(user2);
 		
-		List<User> allUsers = tourGuideService.getAllUsers();
+		List<User> allUsers = userService.getAllUsers();
 
 		tourGuideService.tracker.stopTracking();
 		

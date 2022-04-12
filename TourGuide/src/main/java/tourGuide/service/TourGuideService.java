@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
-import rewardsDocker.service.RewardsService;
 import tourGuide.remote.GpsRemote;
 import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
@@ -69,8 +68,12 @@ public class TourGuideService {
 		return userRemote.getUserByUsername(userName);
 	}
 	
-	public List<User> getAllUsers() {
-		return userRemote.getAllUsers();
+//	public List<User> getAllUsers() {
+//		return userRemote.getAllUsers();
+//	}
+
+	public int getUserCount() {
+		return userRemote.getUserCount();
 	}
 	
 	//public void addUser(User user) {
@@ -304,5 +307,8 @@ public class TourGuideService {
 		LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
 	    return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
 	}
-	
+
+	public List<String> getAllUserNames() {
+		return userRemote.getAllUserNames();
+	}
 }

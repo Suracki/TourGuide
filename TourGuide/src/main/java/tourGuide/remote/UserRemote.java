@@ -1,13 +1,14 @@
 package tourGuide.remote;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestParam;
 import tourGuide.outputEntities.UserLocation;
 import userDocker.controller.UserServiceController;
+import userDocker.gson.MoneyTypeAdapterFactory;
 import userDocker.model.User;
 import userDocker.model.UserReward;
 import userDocker.service.UserService;
@@ -18,12 +19,9 @@ import java.util.UUID;
 
 public class UserRemote {
 
-    UserService userService;
-
     UserServiceController userServiceController;
 
     public UserRemote(UserService userService) {
-        this.userService = userService;
         this.userServiceController = new UserServiceController(userService);
     }
 
@@ -42,34 +40,34 @@ public class UserRemote {
         return allCurrentLocations;
     }
 
-    public void addUserReward(@RequestParam String userName, @RequestParam VisitedLocation visitedLocation,
-                              @RequestParam Attraction attraction, @RequestParam int rewardPoints) {
+    public void addUserReward(String userName, VisitedLocation visitedLocation,
+                              Attraction attraction, int rewardPoints) {
         userServiceController.addUserReward(userName, visitedLocation, attraction, rewardPoints);
     }
 
     public List<User> getAllUsers(){
-//        String jsonListString = userServiceController.getAllUsers();
-//        Type listType = new TypeToken<List<User>>(){}.getType();
-//        List<User> allUsers = new Gson().fromJson(jsonListString, listType);
-//        return allUsers;
-        return userService.getAllUsers();
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(new MoneyTypeAdapterFactory()).create();
+        String json = userServiceController.getAllUsers();
+        Type listType = new TypeToken<List<User>>(){}.getType();
+        List<User> allUsers = gson.fromJson(json, listType);
+        return allUsers;
     }
 
     public User getUserByUsername(String userName) {
-//        String json = userServiceController.getUserByUsername(userName);
-//        Type userType = new TypeToken<User>(){}.getType();
-//        User user = new Gson().fromJson(json, userType);
-//        return user;
-        return userService.getUserByUsername(userName);
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(new MoneyTypeAdapterFactory()).create();
+        String json = userServiceController.getUserByUsername(userName);
+        Type userType = new TypeToken<User>(){}.getType();
+        User user = gson.fromJson(json, userType);
+        return user;
     }
 
     public VisitedLocation getLastVisitedLocationByName(String userName) {
-        System.out.println("TESTED");
+        System.out.println("getLastVisitedLocationByName CALL");
         String json = userServiceController.getLastVisitedLocationByName(userName);
         Type type = new TypeToken<VisitedLocation>(){}.getType();
         VisitedLocation visitedLocation = new Gson().fromJson(json, type);
+        System.out.println("getLastVisitedLocationByName RETURN");
         return visitedLocation;
-        //return userService.getLastVisitedLocationByName(userName);
     }
 
     //Works
@@ -98,4 +96,16 @@ public class UserRemote {
         userServiceController.trackAllUserLocations();
     }
 
+    public int getUserCount() {
+        String json = userServiceController.getUserCount();
+        int userCount = new Gson().fromJson(json, int.class);
+        return userCount;
+    }
+
+    public List<String> getAllUserNames() {
+        String json = userServiceController.getAllUserNames();
+        Type listType = new TypeToken<List<String>>(){}.getType();
+        List<String> userNames = new Gson().fromJson(json, listType);
+        return userNames;
+    }
 }
