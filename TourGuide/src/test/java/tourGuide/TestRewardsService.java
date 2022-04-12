@@ -31,7 +31,7 @@ public class TestRewardsService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 
 
 		InternalTestHelper.setInternalUserNumber(0);
@@ -44,7 +44,7 @@ public class TestRewardsService {
 		userService.addUser(user);
 
 		//tourGuideService.trackUserLocation(user);
-		rewardsService.calculateRewards(user);
+		rewardsService.calculateRewardsByUsername(user.getUserName());
 		List<UserReward> userRewards = user.getUserRewards();
 		tourGuideService.tracker.stopTracking();
 
@@ -56,7 +56,8 @@ public class TestRewardsService {
 		GpsService gpsService = new GpsService(new GpsUtil());
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		UserRemote userRemote = new UserRemote(userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		Attraction attraction = gpsService.getAttractions().get(0);
 		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
 	}
@@ -69,13 +70,13 @@ public class TestRewardsService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 
 
-		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
+		rewardsService.calculateRewardsByUsername(tourGuideService.getAllUsers().get(0).getUserName());
 		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0).getUserName());
 		tourGuideService.tracker.stopTracking();
 

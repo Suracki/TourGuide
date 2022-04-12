@@ -56,7 +56,7 @@ public class TestPerformance {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
@@ -78,7 +78,7 @@ public class TestPerformance {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
@@ -100,7 +100,7 @@ public class TestPerformance {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
@@ -113,7 +113,7 @@ public class TestPerformance {
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
+	    allUsers.forEach(u -> rewardsService.calculateRewardsByUsername(u.getUserName()));
 
 		for(User user : allUsers) {
 			assertTrue(user.getUserRewards().size() > 0);
@@ -133,7 +133,7 @@ public class TestPerformance {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
@@ -155,7 +155,7 @@ public class TestPerformance {
 		for(User user : allUsers) {
 			futures.add(
 					CompletableFuture.runAsync(()-> {
-						rewardsService.calculateRewards(user);
+						rewardsService.calculateRewardsByUsername(user.getUserName());
 					},executorService)
 			);
 		}
@@ -192,7 +192,7 @@ public class TestPerformance {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);

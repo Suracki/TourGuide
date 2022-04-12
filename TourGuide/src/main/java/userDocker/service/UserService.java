@@ -31,12 +31,6 @@ public class UserService {
         usersByName = new ConcurrentHashMap<String, User>(CAPACITY);
     }
 
-//    public UserService(List<User> startingUsers) {
-//        for (User user : startingUsers){
-//            usersByName.put(user.getUserName(), user);
-//        }
-//    }
-
     public int addUsers(List<User> startingUsers) {
         for (User user : startingUsers){
             if(!usersByName.containsKey(user.getUserName())) {

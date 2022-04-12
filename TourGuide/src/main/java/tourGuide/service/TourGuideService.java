@@ -105,7 +105,7 @@ public class TourGuideService {
 		CompletableFuture.supplyAsync(()-> {
 			return userRemote.addToVisitedLocations(visitedLocation, user.getUserName());
 		}, executorService)
-				.thenAccept(n -> {rewardsService.calculateRewards(user);});
+				.thenAccept(n -> {rewardsService.calculateRewardsByUsername(user.getUserName());});
 
 		return visitedLocation;
 	}
@@ -148,7 +148,7 @@ public class TourGuideService {
 			CompletableFuture.supplyAsync(()-> {
 						return userRemote.addToVisitedLocations(gpsRemote.getUserLocation(n.getUserId()), n.getUserName());
 					}, executorService)
-					.thenAccept(y -> {rewardsService.calculateRewards(n);})
+					.thenAccept(y -> {rewardsService.calculateRewardsByUsername(n.getUserName());})
 			);
 		});
 		System.out.println("Futures created: " + futures.size());
@@ -177,7 +177,7 @@ public class TourGuideService {
 		allUsers.forEach((n)-> {
 			futures.add(
 					CompletableFuture.supplyAsync(()-> {
-								return rewardsService.calculateRewardsReturn(n);
+								return rewardsService.calculateRewardsByUsername(n.getUserName());
 							}, executorService)
 			);
 		});
@@ -223,7 +223,7 @@ public class TourGuideService {
 		List<NearbyAttraction> output = new ArrayList<>();
 		attractionsList.forEach((n)-> {output.add(new NearbyAttraction(n.attractionName,
 				n.latitude, n.longitude, visitedLocation.location.latitude, visitedLocation.location.longitude,
-				getDistance(n, visitedLocation.location), rewardsService.getRewardValue(n, visitedLocation.userId)));
+				getDistance(n, visitedLocation.location), rewardsService.getRewardValue(n.attractionId, visitedLocation.userId)));
 
 		});
 

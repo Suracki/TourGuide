@@ -34,7 +34,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 		
@@ -51,7 +51,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
@@ -68,7 +68,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 		
@@ -94,7 +94,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 		
@@ -119,7 +119,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 
@@ -144,7 +144,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 
@@ -180,7 +180,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 		
@@ -200,7 +200,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 		
@@ -222,7 +222,7 @@ public class TestTourGuideService {
 		GpsRemote gpsRemote = new GpsRemote(gpsService);
 		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(userService);
-		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		InternalTestHelper.setInternalUserNumber(0);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsService, userRemote);
 		

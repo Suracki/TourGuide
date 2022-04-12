@@ -4,17 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gpsDocker.service.GpsService;
-import gpsUtil.location.Attraction;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import userDocker.gson.MoneyTypeAdapterFactory;
-import userDocker.model.User;
-import userDocker.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
