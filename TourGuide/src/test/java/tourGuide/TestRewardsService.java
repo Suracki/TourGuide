@@ -6,30 +6,33 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import tourGuide.dockers.gpsDocker.controller.GpsServiceController;
 import org.junit.Test;
 
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
+import tourGuide.dockers.rewardsDocker.controller.RewardsServiceController;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.remote.GpsRemote;
 import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
-import gpsDocker.service.GpsService;
-import rewardsDocker.service.RewardsService;
+import tourGuide.dockers.gpsDocker.service.GpsService;
+import tourGuide.dockers.rewardsDocker.service.RewardsService;
 import tourGuide.service.TourGuideService;
-import userDocker.service.UserService;
-import userDocker.model.User;
-import userDocker.model.UserReward;
+import tourGuide.dockers.userDocker.controller.UserServiceController;
+import tourGuide.dockers.userDocker.service.UserService;
+import tourGuide.dockers.userDocker.model.User;
+import tourGuide.dockers.userDocker.model.UserReward;
 
 public class TestRewardsService {
 
 	@Test
 	public void userGetRewards() {
-		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
-		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
+		GpsRemote gpsRemote = new GpsRemote(new GpsServiceController(new GpsService(new GpsUtil())));
+		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRemote)));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRemote, new RewardCentral(), userRemote)));
 
 
 		InternalTestHelper.setInternalUserNumber(0);
@@ -52,24 +55,21 @@ public class TestRewardsService {
 	@Test
 	public void isWithinAttractionProximity() {
 		GpsService gpsService = new GpsService(new GpsUtil());
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
+		GpsRemote gpsRemote = new GpsRemote(new GpsServiceController(gpsService));
+		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRemote)));
 		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
 		Attraction attraction = gpsService.getAttractions().get(0);
 		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
 	}
 	
-	//@Ignore // Needs fixed - can throw ConcurrentModificationException
 	@Test
 	public void nearAllAttractions() {
 		GpsUtil gpsUtil = new GpsUtil();
-		GpsService gpsService = new GpsService(gpsUtil);
-		GpsRemote gpsRemote = new GpsRemote(gpsService);
-		UserService userService = new UserService(gpsRemote);
-		UserRemote userRemote = new UserRemote(userService);
+
+		GpsRemote gpsRemote = new GpsRemote(new GpsServiceController(new GpsService(gpsUtil)));
+		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRemote)));
 		RewardsService rewardsService = new RewardsService(gpsRemote, new RewardCentral(), userRemote);
-		RewardsRemote rewardsRemote = new RewardsRemote(rewardsService);
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(rewardsService));
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);

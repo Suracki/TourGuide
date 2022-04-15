@@ -1,4 +1,4 @@
-package userDocker.model;
+package tourGuide.dockers.userDocker.model;
 
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;

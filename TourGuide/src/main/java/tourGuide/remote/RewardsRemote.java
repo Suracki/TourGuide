@@ -1,17 +1,18 @@
 package tourGuide.remote;
 
 import com.google.gson.Gson;
-import rewardsDocker.controller.RewardsServiceController;
-import rewardsDocker.service.RewardsService;
+import org.springframework.stereotype.Service;
+import tourGuide.dockers.rewardsDocker.controller.RewardsServiceController;
 
 import java.util.UUID;
 
+@Service
 public class RewardsRemote {
 
     private RewardsServiceController rewardsServiceController;
 
-    public RewardsRemote(RewardsService rewardsService) {
-        this.rewardsServiceController = new RewardsServiceController(rewardsService);
+    public RewardsRemote(RewardsServiceController rewardsServiceController) {
+        this.rewardsServiceController = rewardsServiceController;
     }
 
     public int getRewardValue(UUID attractionId, UUID userid) {

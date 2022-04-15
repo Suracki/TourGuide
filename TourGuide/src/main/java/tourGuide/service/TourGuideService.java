@@ -14,14 +14,15 @@ import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.remote.GpsRemote;
+import tourGuide.remote.GpsRetro;
 import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.outputEntities.NearbyAttraction;
 import tourGuide.outputEntities.UserLocation;
 import tourGuide.tracker.Tracker;
-import userDocker.model.User;
-import userDocker.model.UserReward;
+import tourGuide.dockers.userDocker.model.User;
+import tourGuide.dockers.userDocker.model.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
@@ -35,7 +36,6 @@ public class TourGuideService {
 	public final Tracker tracker;
 	boolean testMode = true;
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
-
 
 	public TourGuideService(GpsRemote gpsRemote, RewardsRemote rewardsRemote, UserRemote userRemote) {
 		//this.gpsService = gpsService;

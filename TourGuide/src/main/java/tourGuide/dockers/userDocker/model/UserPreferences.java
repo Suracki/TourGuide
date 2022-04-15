@@ -1,4 +1,4 @@
-package userDocker.model;
+package tourGuide.dockers.userDocker.model;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;

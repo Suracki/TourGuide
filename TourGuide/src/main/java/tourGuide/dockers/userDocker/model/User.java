@@ -1,6 +1,5 @@
-package userDocker.model;
+package tourGuide.dockers.userDocker.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

@@ -1,4 +1,4 @@
-package userDocker.gson;
+package tourGuide.dockers.userDocker.gson;
 
 import java.io.IOException;
 

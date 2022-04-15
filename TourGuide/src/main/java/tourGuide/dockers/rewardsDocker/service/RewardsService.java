@@ -1,20 +1,20 @@
-package rewardsDocker.service;
+package tourGuide.dockers.rewardsDocker.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
 
-import gpsDocker.service.GpsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
+import tourGuide.dockers.rewardsDocker.controller.RewardsServiceController;
 import tourGuide.remote.GpsRemote;
 import tourGuide.remote.UserRemote;
-import userDocker.model.User;
 
 
 @Service
@@ -30,6 +30,8 @@ public class RewardsService {
 	private final UserRemote userRemote;
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
+	private Logger logger = LoggerFactory.getLogger(RewardsServiceController.class);
+
 	public RewardsService(GpsRemote gpsRemote, RewardCentral rewardCentral, UserRemote userRemote) {
 		this.gpsRemote = gpsRemote;
 		this.rewardsCentral = rewardCentral;
@@ -37,14 +39,19 @@ public class RewardsService {
 	}
 
 	public int getRewardValue(UUID attractionId, UUID userid) {
+		logger.debug("getRewardValue called");
 		return rewardsCentral.getAttractionRewardPoints(attractionId, userid);
 	}
 
 	public String calculateRewardsByUsername(String userName) {
+		logger.debug("calculateRewardsByUsername called");
 
 		List<VisitedLocation> userLocations = userRemote.getVisitedLocationsByUsername(userName);
 		List<Attraction> attractions = gpsRemote.getAttractions();
 		UUID userID = userRemote.getUserIdByUsername(userName);
+
+		logger.debug("userLocations found: " + userLocations.size());
+		logger.debug("attractions found: " + attractions.size());
 
 		CopyOnWriteArrayList<CompletableFuture> futures = new CopyOnWriteArrayList<>();
 
@@ -63,6 +70,8 @@ public class RewardsService {
 			}
 		}
 
+		logger.debug("futures created: " + futures.size() + ", calling get()...");
+
 		futures.forEach((n)-> {
 			try {
 				n.get();
@@ -73,17 +82,21 @@ public class RewardsService {
 			}
 		});
 
+		logger.debug("futures got, returning.");
 		return userName;
 	}
 
 	//Used by tests only
 	public void setProximityBuffer(int proximityBuffer) {
+		logger.debug("proximityBuffer updated to " + proximityBuffer);
 		this.proximityBuffer = proximityBuffer;
 	}
 	public void setDefaultProximityBuffer() {
+		logger.debug("proximityBuffer set to default value (" + defaultProximityBuffer + ")");
 		proximityBuffer = defaultProximityBuffer;
 	}
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
+		logger.debug("isWithinAttractionProximity called");
 		return getDistance(attraction, location) > attractionProximityRange ? false : true;
 	}
 

@@ -2,21 +2,22 @@ package tourGuide.remote;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import gpsDocker.controller.GpsServiceController;
-import gpsDocker.service.GpsService;
+import tourGuide.dockers.gpsDocker.controller.GpsServiceController;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
+import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class GpsRemote {
 
     private GpsServiceController gpsServiceController;
 
-    public GpsRemote(GpsService gpsService) {
-        this.gpsServiceController = new GpsServiceController(gpsService);
+    public GpsRemote(GpsServiceController gpsServiceController) {
+        this.gpsServiceController = gpsServiceController;
     }
 
     public VisitedLocation getUserLocation(UUID userId) {

@@ -1,37 +1,42 @@
-package gpsDocker.controller;
+package tourGuide.dockers.gpsDocker.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import gpsDocker.service.GpsService;
+import tourGuide.dockers.gpsDocker.service.GpsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import userDocker.gson.MoneyTypeAdapterFactory;
+import tourGuide.dockers.userDocker.gson.MoneyTypeAdapterFactory;
 
 import java.util.UUID;
 
+@Service
 @RestController
 public class GpsServiceController {
 
+    private Logger logger = LoggerFactory.getLogger(GpsServiceController.class);
+
     private GpsService gpsService;
 
-    Gson gson = new Gson();
-    ObjectMapper objectMapper;
+    Gson gson;
 
     public GpsServiceController(GpsService gpsService){
         this.gpsService = gpsService;
         gson = new GsonBuilder().registerTypeAdapterFactory(new MoneyTypeAdapterFactory()).create();
-        objectMapper = new ObjectMapper();
     }
 
-    @GetMapping("/getUserLocation")
+    @GetMapping("/gps/getUserLocation")
     public String getUserLocation(@RequestParam UUID userId) {
+        logger.info("/getUserLocation endpoint called");
         return gson.toJson(gpsService.getUserLocation(userId));
     }
 
-    @GetMapping("/getAttractions")
+    @GetMapping("/gps/getAttractions")
     public String getAttractions() {
+        logger.info("/getAttractions endpoint called");
         return gson.toJson(gpsService.getAttractions());
     }
 

@@ -1,4 +1,4 @@
-package userDocker.gson;
+package tourGuide.dockers.userDocker.gson;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;

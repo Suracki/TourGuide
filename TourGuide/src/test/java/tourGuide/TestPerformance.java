@@ -2,28 +2,29 @@ package tourGuide;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
 
+import tourGuide.dockers.gpsDocker.controller.GpsServiceController;
 import org.apache.commons.lang3.time.StopWatch;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
+import tourGuide.dockers.rewardsDocker.controller.RewardsServiceController;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.remote.GpsRemote;
 import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
-import gpsDocker.service.GpsService;
-import rewardsDocker.service.RewardsService;
+import tourGuide.dockers.gpsDocker.service.GpsService;
+import tourGuide.dockers.rewardsDocker.service.RewardsService;
 import tourGuide.service.TourGuideService;
-import userDocker.service.UserService;
-import userDocker.model.User;
+import tourGuide.dockers.userDocker.controller.UserServiceController;
+import tourGuide.dockers.userDocker.service.UserService;
+import tourGuide.dockers.userDocker.model.User;
 
 
 public class TestPerformance {
@@ -52,9 +53,9 @@ public class TestPerformance {
 	
 	@Test
 	public void highVolumeTrackLocationConc() {
-		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
-		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
+		GpsRemote gpsRemote = new GpsRemote(new GpsServiceController(new GpsService(new GpsUtil())));
+		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRemote)));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRemote, new RewardCentral(), userRemote)));
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
@@ -71,9 +72,9 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeTrackLocationAndProcessConc() {
-		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
-		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
+		GpsRemote gpsRemote = new GpsRemote(new GpsServiceController(new GpsService(new GpsUtil())));
+		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRemote)));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRemote, new RewardCentral(), userRemote)));
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		TourGuideService tourGuideService = new TourGuideService(gpsRemote, rewardsRemote, userRemote);
@@ -179,9 +180,9 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewardsOneCall() {
-		GpsRemote gpsRemote = new GpsRemote(new GpsService(new GpsUtil()));
-		UserRemote userRemote = new UserRemote(new UserService(gpsRemote));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsService(gpsRemote, new RewardCentral(), userRemote));
+		GpsRemote gpsRemote = new GpsRemote(new GpsServiceController(new GpsService(new GpsUtil())));
+		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRemote)));
+		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRemote, new RewardCentral(), userRemote)));
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);

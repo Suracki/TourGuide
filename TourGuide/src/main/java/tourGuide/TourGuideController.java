@@ -70,9 +70,5 @@ public class TourGuideController {
     	List<Provider> providers = tourGuideService.getTripDeals(userName);
     	return JsonStream.serialize(providers);
     }
-    
-    //private User getUser(String userName) {
-    	//return tourGuideService.getUser(userName);
-    //}
 
 }

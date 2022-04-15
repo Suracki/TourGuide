@@ -5,24 +5,25 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import tourGuide.outputEntities.UserLocation;
-import userDocker.controller.UserServiceController;
-import userDocker.gson.MoneyTypeAdapterFactory;
-import userDocker.model.User;
-import userDocker.model.UserReward;
-import userDocker.service.UserService;
+import tourGuide.dockers.userDocker.controller.UserServiceController;
+import tourGuide.dockers.userDocker.gson.MoneyTypeAdapterFactory;
+import tourGuide.dockers.userDocker.model.User;
+import tourGuide.dockers.userDocker.model.UserReward;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class UserRemote {
 
     UserServiceController userServiceController;
 
-    public UserRemote(UserService userService) {
-        this.userServiceController = new UserServiceController(userService);
+    public UserRemote(UserServiceController userServiceController) {
+        this.userServiceController = userServiceController;
     }
 
     public boolean addUser(@RequestParam User user) {
