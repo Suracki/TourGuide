@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
-import tourGuide.remote.GpsRemote;
-import tourGuide.remote.GpsRetro;
+import tourGuide.remote.gps.GpsRetro;
 import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
 import tourGuide.helper.InternalTestHelper;
@@ -29,7 +28,7 @@ import tripPricer.TripPricer;
 @Service
 public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
-	private final GpsRemote gpsRemote;
+	private final GpsRetro gpsRetro;
 	private final RewardsRemote rewardsRemote;
 	private final UserRemote userRemote;
 	private final TripPricer tripPricer = new TripPricer();
@@ -37,9 +36,9 @@ public class TourGuideService {
 	boolean testMode = true;
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
-	public TourGuideService(GpsRemote gpsRemote, RewardsRemote rewardsRemote, UserRemote userRemote) {
+	public TourGuideService(GpsRetro gpsRetro, RewardsRemote rewardsRemote, UserRemote userRemote) {
 		//this.gpsService = gpsService;
-		this.gpsRemote = gpsRemote;
+		this.gpsRetro = gpsRetro;
 		this.rewardsRemote = rewardsRemote;
 		this.userRemote = userRemote;
 		
@@ -92,7 +91,7 @@ public class TourGuideService {
 
 	public VisitedLocation trackUserLocationByName(String userName) {
 
-		VisitedLocation visitedLocation = gpsRemote.getUserLocation(userRemote.getUserIdByUsername(userName));
+		VisitedLocation visitedLocation = gpsRetro.getUserLocation(userRemote.getUserIdByUsername(userName));
 
 		CompletableFuture.supplyAsync(()-> {
 					return userRemote.addToVisitedLocations(visitedLocation, userName);
@@ -104,7 +103,7 @@ public class TourGuideService {
 
 	public VisitedLocation trackUserLocation(User user) {
 
-		VisitedLocation visitedLocation = gpsRemote.getUserLocation(user.getUserId());
+		VisitedLocation visitedLocation = gpsRetro.getUserLocation(user.getUserId());
 
 		CompletableFuture.supplyAsync(()-> {
 			return userRemote.addToVisitedLocations(visitedLocation, user.getUserName());
@@ -150,7 +149,7 @@ public class TourGuideService {
 		allUsers.forEach((n)-> {
 			futures.add(
 			CompletableFuture.supplyAsync(()-> {
-						return userRemote.addToVisitedLocations(gpsRemote.getUserLocation(n.getUserId()), n.getUserName());
+						return userRemote.addToVisitedLocations(gpsRetro.getUserLocation(n.getUserId()), n.getUserName());
 					}, executorService)
 					.thenAccept(y -> {rewardsRemote.calculateRewardsByUsername(n.getUserName());})
 			);
@@ -210,7 +209,7 @@ public class TourGuideService {
 		Map<Double, Attraction> attractionsMap = new HashMap<>();
 
 		//Create Map of Distance/Location, place into TreeMap to sort by distance
-		gpsRemote.getAttractions().forEach((n)-> {
+		gpsRetro.getAttractions().forEach((n)-> {
 			attractionsMap.put(getDistance(n, visitedLocation.location), n);
 		});
 		TreeMap<Double, Attraction> sortedAttractionMap = new TreeMap<>(attractionsMap);
@@ -257,7 +256,7 @@ public class TourGuideService {
 	}
 	
 	private void addShutDownHook() {
-		Runtime.getRuntime().addShutdownHook(new Thread() { 
+		Runtime.getRuntime().addShutdownHook(new Thread() {
 		      public void run() {
 		        executorService.shutdown();tracker.stopTracking();
 		      } 
