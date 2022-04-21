@@ -3,6 +3,7 @@ package tourGuide;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,7 +87,6 @@ public class TestTourGuideService {
 	@Test
 	public void getAllUsers() {
 		GpsRemote gpsRemote = new GpsRemote(new GpsServiceController(new GpsService(new GpsUtil())));
-		UserService userService = new UserService(gpsRemote);
 		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRemote)));
 		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRemote, new RewardCentral(), userRemote)));
 		InternalTestHelper.setInternalUserNumber(0);
@@ -98,12 +98,18 @@ public class TestTourGuideService {
 		userRemote.addUser(user);
 		userRemote.addUser(user2);
 		
-		List<User> allUsers = userService.getAllUsers();
+		List<User> allUsers = userRemote.getAllUsers();
+		System.out.println("allUsers size: " + allUsers.size());
 
 		tourGuideService.tracker.stopTracking();
 		
-		assertTrue(allUsers.contains(user));
-		assertTrue(allUsers.contains(user2));
+		List<String> receivedNames = new ArrayList<>();
+		allUsers.forEach(v -> receivedNames.add(v.getUserName()));
+
+		System.out.println("receivedNames size: " + receivedNames.size());
+
+		assertTrue(receivedNames.contains(user.getUserName()));
+		assertTrue(receivedNames.contains(user2.getUserName()));
 	}
 
 	@Test
