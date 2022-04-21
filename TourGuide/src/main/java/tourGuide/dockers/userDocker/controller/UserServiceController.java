@@ -26,89 +26,91 @@ public class UserServiceController {
         gson = new GsonBuilder().registerTypeAdapterFactory(new MoneyTypeAdapterFactory()).create();
     }
 
-    @PostMapping("/addUser")
+    @PostMapping("/user/addUser")
     public boolean addUser(@RequestParam User user) {
         logger.info("/addUser endpoint called");
         return userService.addUser(user);
     }
 
-    @PostMapping("/addToVisitedLocations")
+    @PostMapping("user/addToVisitedLocations")
     public String addToVisitedLocations(@RequestParam VisitedLocation visitedLocation, @RequestParam String userName) {
         logger.info("/addToVisitedLocations endpoint called");
         return userService.addToVisitedLocations(visitedLocation, userName);
     }
 
-    @GetMapping("/getAllCurrentLocations")
+    @GetMapping("user/getAllCurrentLocations")
     public String getAllCurrentLocations() {
         logger.info("/getAllCurrentLocations endpoint called");
         //List<UserLocation>
         return gson.toJson(userService.getAllCurrentLocations());
     }
 
-    @PostMapping("/addUserReward")
-    public void addUserReward(@RequestParam String userName, @RequestParam VisitedLocation visitedLocation,
+    @PostMapping("user/addUserReward")
+    public boolean addUserReward(@RequestParam String userName, @RequestParam VisitedLocation visitedLocation,
                               @RequestParam Attraction attraction, @RequestParam int rewardPoints) {
         logger.info("/addUserReward endpoint called");
-        userService.addUserReward(userName, visitedLocation, attraction, rewardPoints);
+        return userService.addUserReward(userName, visitedLocation, attraction, rewardPoints);
     }
 
-    @RequestMapping("/getAllUsers")
+    @GetMapping("user/getAllUsers")
     public String getAllUsers() {
         logger.info("/getAllUsers endpoint called");
         //List<User>
         return gson.toJson(userService.getAllUsers());
     }
 
-    @GetMapping("/getUser")
+    @GetMapping("/getUserByUsername")
     public String getUserByUsername(String userName) {
         logger.info("/getUser endpoint called");
         //User
         return gson.toJson(userService.getUserByUsername(userName));
     }
 
-    @GetMapping("/getLastVisitedLocationByName")
+    @GetMapping("user/getLastVisitedLocationByName")
     public String getLastVisitedLocationByName(String userName) {
         logger.info("/getLastVisitedLocationByName endpoint called");
         //VisitedLocation
         return gson.toJson(userService.getLastVisitedLocationByName(userName));
     }
 
-    @GetMapping("getUserRewardsByUsername")
+    @GetMapping("user/getUserRewardsByUsername")
     public String getUserRewardsByUsername(String userName) {
         logger.info("/getUserRewardsByUsername endpoint called");
         //List<UserReward>
         return gson.toJson(userService.getUserRewardsByUsername(userName));
     }
 
-    @GetMapping("getVisitedLocationsByUsername")
+    @GetMapping("user/getVisitedLocationsByUsername")
     public String getVisitedLocationsByUsername(String userName) {
         logger.info("/getVisitedLocationsByUsername endpoint called");
         //List<VisitedLocation
         return gson.toJson(userService.getVisitedLocationsByUsername(userName));
     }
 
-    @GetMapping("getUserIdByUsername")
+    @GetMapping("user/getUserIdByUsername")
     public String getUserIdByUsername(String userName) {
         logger.info("/getUserIdByUsername endpoint called");
-        //List<VisitedLocation
+        //UUID
         return gson.toJson(userService.getUserIdByUsername(userName));
     }
 
-    @GetMapping("trackAllUserLocations")
-    public void trackAllUserLocations() {
+    @PostMapping("user/trackAllUserLocations")
+    public boolean trackAllUserLocations() {
         logger.info("/trackAllUserLocations endpoint called");
-        userService.trackAllUserLocations();
+        return userService.trackAllUserLocations();
     }
 
-    @GetMapping("getUserCount")
+    @GetMapping("user/getUserCount")
     public String getUserCount() {
         logger.info("/getUserCount endpoint called");
+        //int
         return gson.toJson(userService.getUserCount());
     }
 
-    @GetMapping("getAllUserNames")
+    @GetMapping("user/getAllUserNames")
     public String getAllUserNames() {
         logger.info("/getAllUserNames endpoint called");
+        //List<String>
         return gson.toJson(userService.getAllUserNames());
     }
 }

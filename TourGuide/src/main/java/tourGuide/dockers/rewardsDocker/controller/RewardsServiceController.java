@@ -25,13 +25,13 @@ public class RewardsServiceController {
         gson = new GsonBuilder().registerTypeAdapterFactory(new MoneyTypeAdapterFactory()).create();
     }
 
-    @GetMapping("/getRewardValue")
+    @GetMapping("/rewards/getRewardValue")
     public String getRewardValue(UUID attractionId, UUID userid) {
         logger.info("/getRewardValue endpoint called");
         return gson.toJson(rewardsService.getRewardValue(attractionId, userid));
     }
 
-    @PostMapping("/calculateRewardsByUsername")
+    @PostMapping("/rewards/calculateRewardsByUsername")
     public String calculateRewardsByUsername(String userName) {
         logger.info("/calculateRewardsByUsername endpoint called");
         return gson.toJson(rewardsService.calculateRewardsByUsername(userName));

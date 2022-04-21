@@ -19,6 +19,8 @@ import tourGuide.remote.UserRemote;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.outputEntities.NearbyAttraction;
 import tourGuide.outputEntities.UserLocation;
+import tourGuide.remote.rewards.RewardsRetro;
+import tourGuide.remote.user.UserRetro;
 import tourGuide.tracker.Tracker;
 import tourGuide.dockers.userDocker.model.User;
 import tourGuide.dockers.userDocker.model.UserReward;
@@ -29,18 +31,18 @@ import tripPricer.TripPricer;
 public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsRetro gpsRetro;
-	private final RewardsRemote rewardsRemote;
-	private final UserRemote userRemote;
+	private final RewardsRetro rewardsRetro;
+	private final UserRetro userRetro;
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
-	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
+	private ExecutorService executorService = Executors.newFixedThreadPool(1000);
 
-	public TourGuideService(GpsRetro gpsRetro, RewardsRemote rewardsRemote, UserRemote userRemote) {
+	public TourGuideService(GpsRetro gpsRetro, RewardsRetro rewardsRetro, UserRetro userRetro) {
 		//this.gpsService = gpsService;
 		this.gpsRetro = gpsRetro;
-		this.rewardsRemote = rewardsRemote;
-		this.userRemote = userRemote;
+		this.rewardsRetro = rewardsRetro;
+		this.userRetro = userRetro;
 		
 		if(testMode) {
 			logger.info("TestMode enabled");
@@ -53,34 +55,26 @@ public class TourGuideService {
 	}
 	
 	public List<UserReward> getUserRewards(String userName) {
-		return userRemote.getUserRewardsByUsername(userName);
+		return userRetro.getUserRewardsByUsername(userName);
 	}
 	
 	public VisitedLocation getUserLocation(String userName) {
-		VisitedLocation visitedLocation = (userRemote.getVisitedLocationsByUsername(userName).size() > 0) ?
-				userRemote.getLastVisitedLocationByName(userName) :
+		VisitedLocation visitedLocation = (userRetro.getVisitedLocationsByUsername(userName).size() > 0) ?
+				userRetro.getLastVisitedLocationByName(userName) :
 				trackUserLocationByName(userName);
 		return visitedLocation;
 	}
 	
 	public User getUser(String userName) {
-		return userRemote.getUserByUsername(userName);
+		return userRetro.getUserByUsername(userName);
 	}
-	
-//	public List<User> getAllUsers() {
-//		return userRemote.getAllUsers();
-//	}
 
 	public int getUserCount() {
-		return userRemote.getUserCount();
+		return userRetro.getUserCount();
 	}
-	
-	//public void addUser(User user) {
-	//	userService.addUser(user);
-	//}
-	
+
 	public List<Provider> getTripDeals(String userName) {
-		User user = userRemote.getUserByUsername(userName);
+		User user = userRetro.getUserByUsername(userName);
 
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
@@ -91,12 +85,12 @@ public class TourGuideService {
 
 	public VisitedLocation trackUserLocationByName(String userName) {
 
-		VisitedLocation visitedLocation = gpsRetro.getUserLocation(userRemote.getUserIdByUsername(userName));
+		VisitedLocation visitedLocation = gpsRetro.getUserLocation(userRetro.getUserIdByUsername(userName));
 
 		CompletableFuture.supplyAsync(()-> {
-					return userRemote.addToVisitedLocations(visitedLocation, userName);
+					return userRetro.addToVisitedLocations(visitedLocation, userName);
 				}, executorService)
-				.thenAccept(n -> {rewardsRemote.calculateRewardsByUsername(userName);});
+				.thenAccept(n -> {rewardsRetro.calculateRewardsByUsername(userName);});
 
 		return visitedLocation;
 	}
@@ -106,42 +100,21 @@ public class TourGuideService {
 		VisitedLocation visitedLocation = gpsRetro.getUserLocation(user.getUserId());
 
 		CompletableFuture.supplyAsync(()-> {
-			return userRemote.addToVisitedLocations(visitedLocation, user.getUserName());
+			return userRetro.addToVisitedLocations(visitedLocation, user.getUserName());
 		}, executorService)
-				.thenAccept(n -> {rewardsRemote.calculateRewardsByUsername(user.getUserName());});
+				.thenAccept(n -> {rewardsRetro.calculateRewardsByUsername(user.getUserName());});
 
 		return visitedLocation;
 	}
 
 	public void trackAllUserLocations() {
-		userRemote.trackAllUserLocations();
-//		List<User> allUsers = userRemote.getAllUsers();
-//
-//		ArrayList<Thread> threads = new ArrayList<>();
-//
-//		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
-//		allUsers.forEach((n)-> {
-//			threads.add(
-//					new Thread( ()-> {
-//						userRemote.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
-//					})
-//					);
-//		});
-//		threads.forEach((n)->n.start());
-//		threads.forEach((n)-> {
-//			try {
-//				n.join();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		});
-
+		userRetro.trackAllUserLocations();
 	}
 
 	public void trackAllUserLocationsAndProcess() {
 
 
-		List<User> allUsers = userRemote.getAllUsers();
+		List<User> allUsers = userRetro.getAllUsers();
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
@@ -149,9 +122,9 @@ public class TourGuideService {
 		allUsers.forEach((n)-> {
 			futures.add(
 			CompletableFuture.supplyAsync(()-> {
-						return userRemote.addToVisitedLocations(gpsRetro.getUserLocation(n.getUserId()), n.getUserName());
+						return userRetro.addToVisitedLocations(gpsRetro.getUserLocation(n.getUserId()), n.getUserName());
 					}, executorService)
-					.thenAccept(y -> {rewardsRemote.calculateRewardsByUsername(n.getUserName());})
+					.thenAccept(y -> {rewardsRetro.calculateRewardsByUsername(n.getUserName());})
 			);
 		});
 		System.out.println("Futures created: " + futures.size());
@@ -172,7 +145,7 @@ public class TourGuideService {
 	public void processAllUserRewards() {
 
 
-		List<User> allUsers = userRemote.getAllUsers();
+		List<User> allUsers = userRetro.getAllUsers();
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
@@ -180,7 +153,7 @@ public class TourGuideService {
 		allUsers.forEach((n)-> {
 			futures.add(
 					CompletableFuture.supplyAsync(()-> {
-								return rewardsRemote.calculateRewardsByUsername(n.getUserName());
+								return rewardsRetro.calculateRewardsByUsername(n.getUserName());
 							}, executorService)
 			);
 		});
@@ -200,7 +173,7 @@ public class TourGuideService {
 	}
 
 	public List<UserLocation> getAllCurrentLocations() {
-		return userRemote.getAllCurrentLocations();
+		return userRetro.getAllCurrentLocations();
 	}
 
 	//Returns 5 nearest attractions
@@ -226,7 +199,7 @@ public class TourGuideService {
 		List<NearbyAttraction> output = new ArrayList<>();
 		attractionsList.forEach((n)-> {output.add(new NearbyAttraction(n.attractionName,
 				n.latitude, n.longitude, visitedLocation.location.latitude, visitedLocation.location.longitude,
-				getDistance(n, visitedLocation.location), rewardsRemote.getRewardValue(n.attractionId, visitedLocation.userId)));
+				getDistance(n, visitedLocation.location), rewardsRetro.getRewardValue(n.attractionId, visitedLocation.userId)));
 
 		});
 
@@ -279,7 +252,7 @@ public class TourGuideService {
 			User user = new User(UUID.randomUUID(), userName, phone, email);
 			generateUserLocationHistory(user);
 
-			userRemote.addUser(user);
+			userRetro.addUser(user);
 		});
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 	}
@@ -308,6 +281,6 @@ public class TourGuideService {
 	}
 
 	public List<String> getAllUserNames() {
-		return userRemote.getAllUserNames();
+		return userRetro.getAllUserNames();
 	}
 }

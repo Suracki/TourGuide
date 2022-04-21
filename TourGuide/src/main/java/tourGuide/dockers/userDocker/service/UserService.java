@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.outputEntities.UserLocation;
-import tourGuide.remote.GpsRemote;
 import tourGuide.dockers.userDocker.model.User;
 import tourGuide.dockers.userDocker.model.UserReward;
+import tourGuide.remote.gps.GpsRetro;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 public class UserService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
     private ConcurrentMap<String, User> usersByName;
-    private final GpsRemote gpsRemote;
+    private final GpsRetro gpsRetro;
 
-    public UserService(GpsRemote gpsRemote) {
-        this.gpsRemote = gpsRemote;
+    public UserService(GpsRetro gpsRetro) {
+        this.gpsRetro = gpsRetro;
         final int CAPACITY = 100;
         usersByName = new ConcurrentHashMap<String, User>(CAPACITY);
     }
@@ -67,10 +67,11 @@ public class UserService {
     }
 
     //TODO: add fail case for user not found
-    public void addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
+    public boolean addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
         logger.debug("addUserReward called");
         User user = getUserByUsername(userName);
         user.addUserReward(new UserReward(visitedLocation, attraction, rewardPoints));
+        return true;
     }
 
     public List<User> getAllUsers() {
@@ -109,7 +110,8 @@ public class UserService {
         return getUserByUsername(userName).getUserId();
     }
 
-    public void trackAllUserLocations() {
+    //TODO: add fail case
+    public boolean trackAllUserLocations() {
         logger.debug("trackAllUserLocations called");
 
         List<User> allUsers = getAllUsers();
@@ -120,7 +122,7 @@ public class UserService {
         allUsers.forEach((n)-> {
             threads.add(
                     new Thread( ()-> {
-                        addToVisitedLocations(gpsRemote.getUserLocation(n.getUserId()), n.getUserName());
+                        addToVisitedLocations(gpsRetro.getUserLocation(n.getUserId()), n.getUserName());
                     })
             );
         });
@@ -135,6 +137,7 @@ public class UserService {
             }
         });
         logger.debug("Threads join()ed, returning.");
+        return true;
     }
 
     public int getUserCount() {

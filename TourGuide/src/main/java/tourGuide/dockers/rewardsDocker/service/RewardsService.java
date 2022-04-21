@@ -13,7 +13,7 @@ import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.dockers.rewardsDocker.controller.RewardsServiceController;
-import tourGuide.remote.GpsRemote;
+import tourGuide.remote.gps.GpsRetro;
 import tourGuide.remote.UserRemote;
 
 
@@ -25,15 +25,15 @@ public class RewardsService {
     private int defaultProximityBuffer = 100;
 	private int proximityBuffer = defaultProximityBuffer;
 	private int attractionProximityRange = 200;
-	private final GpsRemote gpsRemote;
+	private final GpsRetro gpsRetro;
 	private final RewardCentral rewardsCentral;
 	private final UserRemote userRemote;
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
 	private Logger logger = LoggerFactory.getLogger(RewardsServiceController.class);
 
-	public RewardsService(GpsRemote gpsRemote, RewardCentral rewardCentral, UserRemote userRemote) {
-		this.gpsRemote = gpsRemote;
+	public RewardsService(GpsRetro gpsRetro, RewardCentral rewardCentral, UserRemote userRemote) {
+		this.gpsRetro = gpsRetro;
 		this.rewardsCentral = rewardCentral;
 		this.userRemote = userRemote;
 	}
@@ -47,7 +47,7 @@ public class RewardsService {
 		logger.debug("calculateRewardsByUsername called");
 
 		List<VisitedLocation> userLocations = userRemote.getVisitedLocationsByUsername(userName);
-		List<Attraction> attractions = gpsRemote.getAttractions();
+		List<Attraction> attractions = gpsRetro.getAttractions();
 		UUID userID = userRemote.getUserIdByUsername(userName);
 
 		logger.debug("userLocations found: " + userLocations.size());

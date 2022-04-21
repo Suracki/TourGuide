@@ -18,6 +18,8 @@ import tourGuide.remote.gps.GpsRetro;
 import tourGuide.remote.RewardsRemote;
 import tourGuide.remote.UserRemote;
 import tourGuide.dockers.rewardsDocker.service.RewardsService;
+import tourGuide.remote.rewards.RewardsRetro;
+import tourGuide.remote.user.UserRetro;
 import tourGuide.service.TourGuideService;
 import tourGuide.dockers.userDocker.controller.UserServiceController;
 import tourGuide.dockers.userDocker.service.UserService;
@@ -46,16 +48,16 @@ public class TestPerformance {
 	 *          assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
 
-	private static final int NUMBER_OF_TEST_USERS = 100;
+	private static final int NUMBER_OF_TEST_USERS = 10;
 	
 	@Test
 	public void highVolumeTrackLocationConc() {
 		GpsRetro gpsRetro = new GpsRetro();
-		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRetro)));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRetro, new RewardCentral(), userRemote)));
+		UserRetro userRetro = new UserRetro();
+		RewardsRetro rewardsRetro = new RewardsRetro();
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
-		TourGuideService tourGuideService = new TourGuideService(gpsRetro, rewardsRemote, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRetro, rewardsRetro, userRetro);
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -70,11 +72,11 @@ public class TestPerformance {
 	@Test
 	public void highVolumeTrackLocationAndProcessConc() {
 		GpsRetro gpsRetro = new GpsRetro();
-		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRetro)));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRetro, new RewardCentral(), userRemote)));
+		UserRetro userRetro = new UserRetro();
+		RewardsRetro rewardsRetro = new RewardsRetro();
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
-		TourGuideService tourGuideService = new TourGuideService(gpsRetro, rewardsRemote, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRetro, rewardsRetro, userRetro);
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -89,26 +91,26 @@ public class TestPerformance {
 	@Test
 	public void highVolumeGetRewardsOneCall() {
 		GpsRetro gpsRetro = new GpsRetro();
-		UserRemote userRemote = new UserRemote(new UserServiceController(new UserService(gpsRetro)));
-		RewardsRemote rewardsRemote = new RewardsRemote(new RewardsServiceController(new RewardsService(gpsRetro, new RewardCentral(), userRemote)));
+		UserRetro userRetro = new UserRetro();
+		RewardsRetro rewardsRetro = new RewardsRetro();
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
 		InternalTestHelper.setInternalUserNumber(NUMBER_OF_TEST_USERS);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(gpsRetro, rewardsRemote, userRemote);
+		TourGuideService tourGuideService = new TourGuideService(gpsRetro, rewardsRetro, userRetro);
 
 		System.out.println("Starting Adding Locations");
 
 		Attraction attraction = gpsRetro.getAttractions().get(0);
-		List<User> allUsers = userRemote.getAllUsers();
-		allUsers.forEach(u -> userRemote.addToVisitedLocations((new VisitedLocation(u.getUserId(), attraction, new Date())), u.getUserName()));
+		List<User> allUsers = userRetro.getAllUsers();
+		allUsers.forEach(u -> userRetro.addToVisitedLocations((new VisitedLocation(u.getUserId(), attraction, new Date())), u.getUserName()));
 
 		System.out.println("Done Adding Locations");
 		System.out.println("Starting Calculating Rewards");
 
 		tourGuideService.processAllUserRewards();
-		allUsers = userRemote.getAllUsers();
+		allUsers = userRetro.getAllUsers();
 
 		System.out.println("Done Calculating Rewards");
 		System.out.println("Starting Asserting");

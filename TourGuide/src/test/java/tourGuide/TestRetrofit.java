@@ -3,6 +3,7 @@ package tourGuide;
 
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 @AutoConfigureMockMvc
 public class TestRetrofit {
 
+    @Ignore
     @Test
     public void testGpsRetroGetAttractions() {
 
@@ -32,6 +34,7 @@ public class TestRetrofit {
         assertTrue(attractionList.size() > 0);
     }
 
+    @Ignore
     @Test
     public void testGpsRetroGetUserLocation() {
 
