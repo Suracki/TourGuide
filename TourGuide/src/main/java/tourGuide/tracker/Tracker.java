@@ -43,7 +43,7 @@ public class Tracker extends Thread {
 			int userCount = tourGuideService.getUserCount();
 			logger.debug("Begin Tracker. Tracking " + userCount + " users.");
 			stopWatch.start();
-			tourGuideService.trackAllUserLocationsAndProcess();
+			//tourGuideService.trackAllUserLocationsAndProcess();
 			stopWatch.stop();
 			logger.debug("Tracker Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 			stopWatch.reset();

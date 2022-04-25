@@ -33,6 +33,20 @@ targetCompatibility = 1.8
 dependencies {
     implementation group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.0.1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+//    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+//    implementation 'io.springfox:springfox-swagger2:2.9.2'
+//    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
+//    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+//    // https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter
+//    //implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.7.0'
+    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+    implementation 'io.springfox:springfox-swagger2:2.7.0'
+
+
+
+
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.3'
     implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
