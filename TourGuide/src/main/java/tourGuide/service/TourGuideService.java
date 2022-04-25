@@ -38,7 +38,6 @@ public class TourGuideService {
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
 	public TourGuideService(GpsRemote gpsRemote, RewardsRemote rewardsRemote, UserRemote userRemote) {
-		//this.gpsService = gpsService;
 		this.gpsRemote = gpsRemote;
 		this.rewardsRemote = rewardsRemote;
 		this.userRemote = userRemote;
@@ -68,18 +67,10 @@ public class TourGuideService {
 		return userRemote.getUserByUsername(userName);
 	}
 	
-//	public List<User> getAllUsers() {
-//		return userRemote.getAllUsers();
-//	}
-
 	public int getUserCount() {
 		return userRemote.getUserCount();
 	}
-	
-	//public void addUser(User user) {
-	//	userService.addUser(user);
-	//}
-	
+
 	public List<Provider> getTripDeals(String userName) {
 		User user = userRemote.getUserByUsername(userName);
 
@@ -116,27 +107,6 @@ public class TourGuideService {
 
 	public void trackAllUserLocations() {
 		userRemote.trackAllUserLocations();
-//		List<User> allUsers = userRemote.getAllUsers();
-//
-//		ArrayList<Thread> threads = new ArrayList<>();
-//
-//		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
-//		allUsers.forEach((n)-> {
-//			threads.add(
-//					new Thread( ()-> {
-//						userRemote.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
-//					})
-//					);
-//		});
-//		threads.forEach((n)->n.start());
-//		threads.forEach((n)-> {
-//			try {
-//				n.join();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		});
-
 	}
 
 	public void trackAllUserLocationsAndProcess() {
@@ -181,8 +151,8 @@ public class TourGuideService {
 		allUsers.forEach((n)-> {
 			futures.add(
 					CompletableFuture.supplyAsync(()-> {
-								return rewardsRemote.calculateRewardsByUsername(n.getUserName());
-							}, executorService)
+						return rewardsRemote.calculateRewardsByUsername(n.getUserName());
+					}, executorService)
 			);
 		});
 		System.out.println("Futures created: " + futures.size());

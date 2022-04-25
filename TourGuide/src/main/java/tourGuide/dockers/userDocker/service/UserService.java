@@ -13,8 +13,7 @@ import tourGuide.dockers.userDocker.model.UserReward;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,21 +21,13 @@ public class UserService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
     private ConcurrentMap<String, User> usersByName;
     private final GpsRemote gpsRemote;
+    private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
     public UserService(GpsRemote gpsRemote) {
         this.gpsRemote = gpsRemote;
         final int CAPACITY = 100;
         usersByName = new ConcurrentHashMap<String, User>(CAPACITY);
     }
-
-//    public int addUsers(List<User> startingUsers) {
-//        for (User user : startingUsers){
-//            if(!usersByName.containsKey(user.getUserName())) {
-//                usersByName.put(user.getUserName(), user);
-//            }
-//        }
-//        return usersByName.size();
-//    }
 
     public boolean addUser(User user){
         logger.debug("addUser called");
@@ -109,7 +100,7 @@ public class UserService {
         return getUserByUsername(userName).getUserId();
     }
 
-    public void trackAllUserLocations() {
+    public void trackAllUserLocationsThreads() {
         logger.debug("trackAllUserLocations called");
 
         List<User> allUsers = getAllUsers();
@@ -135,6 +126,36 @@ public class UserService {
             }
         });
         logger.debug("Threads join()ed, returning.");
+    }
+
+    public void trackAllUserLocations() {
+        logger.debug("trackAllUserLocations called");
+
+        List<User> allUsers = getAllUsers();
+        ArrayList<CompletableFuture> futures = new ArrayList<>();
+
+        logger.debug("Creating futures for " + allUsers.size() + " user(s)");
+
+        allUsers.forEach((n)-> {
+            futures.add(
+                    CompletableFuture.supplyAsync(()-> {
+                        return addToVisitedLocations(gpsRemote.getUserLocation(n.getUserId()), n.getUserName());
+                    }, executorService)
+            );
+        });
+
+        logger.debug("Futures created: " + futures.size());
+        logger.debug("Getting futures...");
+        futures.forEach((n)-> {
+            try {
+                n.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+        logger.debug("Done!");
     }
 
     public int getUserCount() {
