@@ -58,8 +58,8 @@ public class TestTourGuideService {
 		tourGuideService.addUser(user);
 		tourGuideService.addUser(user2);
 		
-		User retrivedUser = tourGuideService.getUser(user.getUserName());
-		User retrivedUser2 = tourGuideService.getUser(user2.getUserName());
+		User retrivedUser = tourGuideService.getUserByUsername(user.getUserName());
+		User retrivedUser2 = tourGuideService.getUserByUsername(user2.getUserName());
 
 		tourGuideService.tracker.stopTracking();
 		
@@ -143,8 +143,7 @@ public class TestTourGuideService {
 		
 		assertEquals(user.getUserId(), visitedLocation.userId);
 	}
-	
-	//@Ignore // Not yet implemented
+
 	@Test
 	public void getNearbyAttractions() {
 		GpsUtil gpsUtil = new GpsUtil();
@@ -179,7 +178,7 @@ public class TestTourGuideService {
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		userService.addUser(user);
 
-		List<Provider> providers = tourGuideService.getTripDeals(user);
+		List<Provider> providers = tourGuideService.getTripDeals(user.getUserName());
 		
 		tourGuideService.tracker.stopTracking();
 		
@@ -208,8 +207,8 @@ public class TestTourGuideService {
 		userSolo.getUserPreferences().setAttractionProximity(500);
 		userService.addUser(userSolo);
 
-		List<Provider> providersGroup = tourGuideService.getTripDeals(userGroup);
-		List<Provider> providersSolo = tourGuideService.getTripDeals(userSolo);
+		List<Provider> providersGroup = tourGuideService.getTripDeals(userGroup.getUserName());
+		List<Provider> providersSolo = tourGuideService.getTripDeals(userSolo.getUserName());
 
 		System.out.println("Number of providers solo:" + providersSolo);
 		System.out.println("Number of providers family:" + providersGroup);

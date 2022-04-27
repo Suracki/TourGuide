@@ -53,18 +53,19 @@ public class TourGuideService {
 		addShutDownHook();
 	}
 	
-	public List<UserReward> getUserRewards(User user) {
-		return user.getUserRewards();
+	public List<UserReward> getUserRewards(String userName) {
+		return getUserByUsername(userName).getUserRewards();
 	}
 	
-	public VisitedLocation getUserLocation(User user) {
+	public VisitedLocation getUserLocation(String userName) {
+		User user = getUserByUsername(userName);
 		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ?
 			user.getLastVisitedLocation() :
 			trackUserLocation(user);
 		return visitedLocation;
 	}
-	
-	public User getUser(String userName) {
+
+	public User getUserByUsername(String userName) {
 		return userService.getUserByUsername(userName);
 	}
 	
@@ -76,8 +77,8 @@ public class TourGuideService {
 		userService.addUser(user);
 	}
 	
-	public List<Provider> getTripDeals(User user) {
-		return tripService.getTripDeals(user);
+	public List<Provider> getTripDeals(String userName) {
+		return tripService.getTripDeals(getUserByUsername(userName));
 	}
 
 	public VisitedLocation trackUserLocation(User user) {
