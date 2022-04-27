@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Service
 public class GpsService {
-    private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
+    private Logger logger = LoggerFactory.getLogger(GpsService.class);
     private final GpsUtil gpsUtil;
 
     public GpsService(GpsUtil gpsUtil) {

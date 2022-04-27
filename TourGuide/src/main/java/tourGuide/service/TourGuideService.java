@@ -31,16 +31,17 @@ public class TourGuideService {
 	private final GpsService gpsService;
 	private final RewardsService rewardsService;
 	private final UserService userService;
-	private final TripPricer tripPricer = new TripPricer();
+	private final TripService tripService;
 	public final Tracker tracker;
 	boolean testMode = true;
 	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
 
 
-	public TourGuideService(GpsService gpsService, RewardsService rewardsService, UserService userService) {
+	public TourGuideService(GpsService gpsService, RewardsService rewardsService, UserService userService, TripService tripService) {
 		this.gpsService = gpsService;
 		this.rewardsService = rewardsService;
 		this.userService = userService;
+		this.tripService = tripService;
 		
 		if(testMode) {
 			logger.info("TestMode enabled");
@@ -76,11 +77,7 @@ public class TourGuideService {
 	}
 	
 	public List<Provider> getTripDeals(User user) {
-		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
-		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
-				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
-		user.setTripDeals(providers);
-		return providers;
+		return tripService.getTripDeals(user);
 	}
 
 	public VisitedLocation trackUserLocation(User user) {
@@ -253,7 +250,6 @@ public class TourGuideService {
 	 * Methods Below: For Internal Testing
 	 * 
 	 **********************************************************************************/
-	private static final String tripPricerApiKey = "test-server-api-key";
 	// Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
 	//private final Map<String, User> internalUserMap = new HashMap<>();
 	private void initializeInternalUsers() {
