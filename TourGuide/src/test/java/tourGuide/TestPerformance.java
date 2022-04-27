@@ -43,7 +43,7 @@ public class TestPerformance {
 	 *          assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
 
-	private static final int NUMBER_OF_TEST_USERS = 100;
+	private static final int NUMBER_OF_TEST_USERS = 100000;
 	
 	@Test
 	public void highVolumeTrackLocation() {
@@ -77,7 +77,8 @@ public class TestPerformance {
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		tourGuideService.trackAllUserLocationsAndProcess();
+		tourGuideService.trackAllUserLocations();
+		tourGuideService.processAllUserRewards();
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 

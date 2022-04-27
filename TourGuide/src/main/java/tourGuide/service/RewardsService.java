@@ -78,29 +78,27 @@ public class RewardsService {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsService.getAttractions();
 
-		ArrayList<CompletableFuture> futures = new ArrayList<>();
+		ArrayList<Thread> threads = new ArrayList<>();
 
 		for(VisitedLocation visitedLocation : userLocations) {
 			for (Attraction attr : attractions) {
-				futures.add(
-						CompletableFuture.runAsync(()-> {
+				threads.add(
+						new Thread( ()-> {
 							if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
 
 								if(nearAttraction(visitedLocation, attr)) {
 									userService.addUserReward(user.getUserName(), visitedLocation, attr, getRewardPoints(attr, user.getUserId()));
 								}
 							}
-						},executorService)
+						})
 				);
 			}
 		}
-
-		futures.forEach((n)-> {
+		threads.forEach((n)->n.start());
+		threads.forEach((n)-> {
 			try {
-				n.get();
+				n.join();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
 		});
@@ -111,29 +109,27 @@ public class RewardsService {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsService.getAttractions();
 
-		CopyOnWriteArrayList<CompletableFuture> futures = new CopyOnWriteArrayList<CompletableFuture>();
+		ArrayList<Thread> threads = new ArrayList<>();
 
 		for(VisitedLocation visitedLocation : userLocations) {
 			for (Attraction attr : attractions) {
-				futures.add(
-						CompletableFuture.runAsync(()-> {
+				threads.add(
+						new Thread( ()-> {
 							if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attr.attractionName)).count() == 0) {
 
 								if(nearAttraction(visitedLocation, attr)) {
 									userService.addUserReward(user.getUserName(), visitedLocation, attr, getRewardPoints(attr, user.getUserId()));
 								}
 							}
-						},executorService)
+						})
 				);
 			}
 		}
-
-		futures.forEach((n)-> {
+		threads.forEach((n)->n.start());
+		threads.forEach((n)-> {
 			try {
-				n.get();
+				n.join();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
 		});

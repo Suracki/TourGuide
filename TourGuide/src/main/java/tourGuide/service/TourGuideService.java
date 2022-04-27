@@ -126,25 +126,23 @@ public class TourGuideService {
 
 		List<User> allUsers = userService.getAllUsers();
 
-		ArrayList<CompletableFuture> futures = new ArrayList<>();
+		ArrayList<Thread> threads = new ArrayList<>();
 
 		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
 		allUsers.forEach((n)-> {
-			futures.add(
-			CompletableFuture.supplyAsync(()-> {
-						return userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
-					}, executorService)
-					.thenAccept(y -> {rewardsService.calculateRewards(n);})
+			threads.add(
+					new Thread( ()-> {
+						userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+						rewardsService.calculateRewards(n);
+					})
 			);
 		});
-		System.out.println("Futures created: " + futures.size());
-		System.out.println("Getting futures...");
-		futures.forEach((n)-> {
+		threads.forEach((n)->n.start());
+		System.out.println("Joining threads...");
+		threads.forEach((n)-> {
 			try {
-				n.get();
+				n.join();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
 		});
@@ -157,24 +155,22 @@ public class TourGuideService {
 
 		List<User> allUsers = userService.getAllUsers();
 
-		ArrayList<CompletableFuture> futures = new ArrayList<>();
+		ArrayList<Thread> threads = new ArrayList<>();
 
 		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
 		allUsers.forEach((n)-> {
-			futures.add(
-					CompletableFuture.supplyAsync(()-> {
-								return rewardsService.calculateRewardsReturn(n);
-							}, executorService)
+			threads.add(
+					new Thread( ()-> {
+						rewardsService.calculateRewardsReturn(n);
+					})
 			);
 		});
-		System.out.println("Futures created: " + futures.size());
-		System.out.println("Getting futures...");
-		futures.forEach((n)-> {
+		threads.forEach((n)->n.start());
+		System.out.println("Joining threads...");
+		threads.forEach((n)-> {
 			try {
-				n.get();
+				n.join();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
 		});

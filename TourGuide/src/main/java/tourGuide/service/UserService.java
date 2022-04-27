@@ -61,7 +61,6 @@ public class UserService {
     }
 
     public boolean addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
-        System.out.println("adding reward");
         User user = getUserByUsername(userName);
         if (user != null) {
             user.addUserReward(new UserReward(visitedLocation, attraction, rewardPoints));
