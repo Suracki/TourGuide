@@ -96,24 +96,24 @@ public class TourGuideService {
 	public void trackAllUserLocations() {
 		List<User> allUsers = userService.getAllUsers();
 
-		ArrayList<Thread> threads = new ArrayList<>();
+		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
 		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
 		allUsers.forEach((n)-> {
-			threads.add(
-					new Thread( ()-> {
-						userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
-					})
-					);
+			futures.add(
+					CompletableFuture.supplyAsync(()-> {
+								return userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+							}, executorService)
+			);
 		});
-		System.out.println("Thread array size: " + threads.size());
-		System.out.println("Starting threads...");
-		threads.forEach((n)->n.start());
-		System.out.println("Joining threads...");
-		threads.forEach((n)-> {
+		System.out.println("Futures created: " + futures.size());
+		System.out.println("Getting futures...");
+		futures.forEach((n)-> {
 			try {
-				n.join();
+				n.get();
 			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
 		});
