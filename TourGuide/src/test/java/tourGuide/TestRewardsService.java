@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -33,13 +34,19 @@ public class TestRewardsService {
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, userService, tripService);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-		Attraction attraction = gpsUtil.getAttractions().get(0);
+		Attraction attraction = gpsUtil.getAttractions().get(5);
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
-		tourGuideService.trackUserLocation(user);
-		List<UserReward> userRewards = user.getUserRewards();
-		System.out.println("Size " + userRewards.size());
+		tourGuideService.addUser(user);
+
+		rewardsService.calculateRewards(user);
+
+		User updatedUser = userService.getUserByUsername(user.getUserName());
+
+		List<UserReward> userRewards = updatedUser.getUserRewards();
 		tourGuideService.tracker.stopTracking();
-		assertTrue(userRewards.size() == 2);
+
+		System.out.println("Size: " + userRewards.size());
+		assertTrue(userRewards.size() == 1);
 	}
 	
 	@Test

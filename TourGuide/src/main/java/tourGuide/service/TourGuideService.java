@@ -287,5 +287,8 @@ public class TourGuideService {
 		LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
 	    return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
 	}
-	
+
+	public int getUserCount() {
+		return userService.getUserCount();
+	}
 }

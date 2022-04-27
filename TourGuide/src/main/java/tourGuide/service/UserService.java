@@ -26,12 +26,6 @@ public class UserService {
         usersByName = new ConcurrentHashMap<String, User>(CAPACITY);
     }
 
-    public UserService(List<User> startingUsers) {
-        for (User user : startingUsers){
-            usersByName.put(user.getUserName(), user);
-        }
-    }
-
     public int addUsers(List<User> startingUsers) {
         for (User user : startingUsers){
             if(!usersByName.containsKey(user.getUserName())) {
@@ -41,15 +35,21 @@ public class UserService {
         return usersByName.size();
     }
 
-    public void addUser(User user){
+    public boolean addUser(User user){
         if(!usersByName.containsKey(user.getUserName())) {
             usersByName.put(user.getUserName(), user);
+            return true;
         }
+        return false;
     }
 
-    public String addToVisitedLocations(VisitedLocation visitedLocation, String userName) {
-        usersByName.get(userName).addToVisitedLocations(visitedLocation);
-        return userName;
+    public boolean addToVisitedLocations(VisitedLocation visitedLocation, String userName) {
+        User user = usersByName.get(userName);
+        if (user != null) {
+            user.addToVisitedLocations(visitedLocation);
+            return true;
+        }
+        return false;
     }
 
     public List<UserLocation> getAllCurrentLocations() {
@@ -60,9 +60,14 @@ public class UserService {
         return userLocations;
     }
 
-    public void addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
+    public boolean addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
+        System.out.println("adding reward");
         User user = getUserByUsername(userName);
-        user.addUserReward(new UserReward(visitedLocation, attraction, rewardPoints));
+        if (user != null) {
+            user.addUserReward(new UserReward(visitedLocation, attraction, rewardPoints));
+            return true;
+        }
+        return false;
     }
 
     public List<User> getAllUsers() {
@@ -71,5 +76,9 @@ public class UserService {
 
     public User getUserByUsername(String userName) {
         return usersByName.get(userName);
+    }
+
+    public int getUserCount() {
+        return usersByName.size();
     }
 }

@@ -71,9 +71,19 @@ public class User {
 	}
 	
 	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction.attractionName)).count() == 0) {
-			userRewards.add(userReward);
-		}
+			boolean found = false;
+			for (UserReward reward : userRewards) {
+				if (reward.attraction.attractionName.equals(userReward.attraction.attractionName)) {
+					found = true;
+				}
+			}
+			if (found) {
+				//Do not add duplicate
+			}
+			else {
+				//Add reward
+				userRewards.add(userReward);
+			}
 	}
 	
 	public List<UserReward> getUserRewards() {
