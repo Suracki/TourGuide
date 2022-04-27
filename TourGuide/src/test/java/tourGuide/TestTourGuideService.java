@@ -177,12 +177,64 @@ public class TestTourGuideService {
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, userService, tripService);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+		userService.addUser(user);
 
 		List<Provider> providers = tourGuideService.getTripDeals(user);
 		
 		tourGuideService.tracker.stopTracking();
 		
 		assertEquals(5, providers.size());
+	}
+
+	@Test
+	public void tripDealsUsesUserPreferencesWhenObtainingPrices() {
+		GpsUtil gpsUtil = new GpsUtil();
+		GpsService gpsService = new GpsService(gpsUtil);
+		UserService userService = new UserService();
+		TripService tripService = new TripService(new TripPricer());
+		RewardsService rewardsService = new RewardsService(gpsService, new RewardCentral(), userService);
+		InternalTestHelper.setInternalUserNumber(0);
+		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, userService, tripService);
+
+		User userGroup = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+		userGroup.getUserPreferences().setNumberOfAdults(10);
+		userGroup.getUserPreferences().setNumberOfChildren(30);
+		userGroup.getUserPreferences().setAttractionProximity(50);
+		userService.addUser(userGroup);
+
+		User userSolo = new User(UUID.randomUUID(), "john", "111", "john@tourGuide.com");
+		userSolo.getUserPreferences().setNumberOfAdults(1);
+		userSolo.getUserPreferences().setNumberOfChildren(0);
+		userSolo.getUserPreferences().setAttractionProximity(500);
+		userService.addUser(userSolo);
+
+		List<Provider> providersGroup = tourGuideService.getTripDeals(userGroup);
+		List<Provider> providersSolo = tourGuideService.getTripDeals(userSolo);
+
+		System.out.println("Number of providers solo:" + providersSolo);
+		System.out.println("Number of providers family:" + providersGroup);
+
+		int groupPrice = 0;
+		int soloPrice = 0;
+		for (Provider p : providersGroup) {
+			groupPrice += p.price;
+		}
+		for (Provider p : providersSolo) {
+			soloPrice += p.price;
+		}
+
+		System.out.println("Number of providers solo:" + providersSolo.size());
+		System.out.println("Number of providers family:" + providersGroup.size());
+
+		tourGuideService.tracker.stopTracking();
+
+		System.out.println("Total price of providers solo:" + soloPrice);
+		System.out.println("Total price of providers family:" + groupPrice);
+
+
+		assertEquals(5, providersSolo.size());
+		assertEquals(5, providersGroup.size());
+		assertTrue(groupPrice > soloPrice);
 	}
 	
 	
