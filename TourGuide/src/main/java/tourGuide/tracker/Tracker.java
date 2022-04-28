@@ -9,12 +9,15 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 
 public class Tracker extends Thread {
 	private Logger logger = LoggerFactory.getLogger(Tracker.class);
-	private static final long trackingPollingInterval = TimeUnit.MINUTES.toSeconds(5);
+	@Value("${tracking.polling.interval}")
+	private static final int trackingPollingIntervalMins = 5;
+	private static final long trackingPollingInterval = TimeUnit.MINUTES.toSeconds(trackingPollingIntervalMins);
 	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private final TourGuideService tourGuideService;
 	private boolean stop = false;
