@@ -10,6 +10,7 @@ import tourGuide.service.GpsService;
 import tourGuide.service.RewardsService;
 import tourGuide.service.UserService;
 import tourGuide.user.User;
+import tripPricer.TripPricer;
 
 @Configuration
 public class TourGuideModule {
@@ -17,6 +18,11 @@ public class TourGuideModule {
 	@Bean
 	public GpsUtil getGpsUtil() {
 		return new GpsUtil();
+	}
+
+	@Bean
+	public TripPricer getTripPricer() {
+		return new TripPricer();
 	}
 
 	@Bean

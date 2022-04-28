@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.location.Attraction;
@@ -26,8 +27,10 @@ public class RewardsService {
 	private final RewardCentral rewardsCentral;
 	private final UserService userService;
 
-	//new
-	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
+	//concurrency variables
+	@Value("${thread.pool.size}")
+	private int threadPoolSize = 500;
+	private ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
 
 	public RewardsService(GpsService gpsService, RewardCentral rewardCentral, UserService userService) {
 		this.gpsService = gpsService;

@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import com.jsoniter.output.JsonStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.GpsUtil;
@@ -23,7 +24,6 @@ import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
-import tripPricer.TripPricer;
 
 @Service
 public class TourGuideService {
@@ -34,7 +34,9 @@ public class TourGuideService {
 	private final TripService tripService;
 	public final Tracker tracker;
 	boolean testMode = true;
-	private ExecutorService executorService = Executors.newFixedThreadPool(10000);
+	@Value("${thread.pool.size}")
+	private int threadPoolSize = 500;
+	private ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
 
 
 	public TourGuideService(GpsService gpsService, RewardsService rewardsService, UserService userService, TripService tripService) {
@@ -59,6 +61,9 @@ public class TourGuideService {
 	
 	public VisitedLocation getUserLocation(String userName) {
 		User user = getUserByUsername(userName);
+		if (user==null) {
+			return null;
+		}
 		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ?
 			user.getLastVisitedLocation() :
 			trackUserLocation(user);
@@ -78,6 +83,10 @@ public class TourGuideService {
 	}
 	
 	public List<Provider> getTripDeals(String userName) {
+		User user = getUserByUsername(userName);
+		if (user == null) {
+			return null;
+		}
 		return tripService.getTripDeals(getUserByUsername(userName));
 	}
 
@@ -96,24 +105,24 @@ public class TourGuideService {
 	public void trackAllUserLocations() {
 		List<User> allUsers = userService.getAllUsers();
 
-		ArrayList<Thread> threads = new ArrayList<>();
+		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
 		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
 		allUsers.forEach((n)-> {
-			threads.add(
-					new Thread( ()-> {
-						userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
-					})
-					);
+			futures.add(
+					CompletableFuture.supplyAsync(()-> {
+						return userService.addToVisitedLocations(gpsService.getUserLocation(n.getUserId()), n.getUserName());
+					}, executorService)
+			);
 		});
-		System.out.println("Thread array size: " + threads.size());
-		System.out.println("Starting threads...");
-		threads.forEach((n)->n.start());
-		System.out.println("Joining threads...");
-		threads.forEach((n)-> {
+		System.out.println("Futures created: " + futures.size());
+		System.out.println("Getting futures...");
+		futures.forEach((n)-> {
 			try {
-				n.join();
+				n.get();
 			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
 		});
@@ -262,7 +271,9 @@ public class TourGuideService {
 			generateUserLocationHistory(user);
 
 			userService.addUser(user);
+			System.out.println(userName);
 		});
+
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 	}
 	
@@ -291,5 +302,10 @@ public class TourGuideService {
 
 	public int getUserCount() {
 		return userService.getUserCount();
+	}
+
+	public void generateRewards(String userName) {
+		User user = getUserByUsername(userName);
+		userService.addUserReward(userName, user.getLastVisitedLocation(), gpsService.getAttractions().get(0), 100);
 	}
 }

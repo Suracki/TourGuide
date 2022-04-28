@@ -20,8 +20,4 @@ public class UserLocation {
         this.longitude = location.location.longitude;
         this.latitude = location.location.latitude;
     }
-
-    public String getUserID() {
-        return userId;
-    }
 }
