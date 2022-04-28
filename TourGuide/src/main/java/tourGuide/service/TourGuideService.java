@@ -4,16 +4,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.jsoniter.output.JsonStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
@@ -25,6 +22,9 @@ import tourGuide.user.User;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
 
+/**
+ * TourGuideService performs operations for TourGuideController, as well as performing services for Tracker thread
+ */
 @Service
 public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
@@ -54,11 +54,23 @@ public class TourGuideService {
 		tracker = new Tracker(this);
 		addShutDownHook();
 	}
-	
+
+	/**
+	 * Get all current UserRewards for provided user
+	 *
+	 * @param userName
+	 * @return List<UserReward>
+	 */
 	public List<UserReward> getUserRewards(String userName) {
 		return getUserByUsername(userName).getUserRewards();
 	}
-	
+
+	/**
+	 * Get current location of provided user
+	 *
+	 * @param userName
+	 * @return VisitedLocation
+	 */
 	public VisitedLocation getUserLocation(String userName) {
 		User user = getUserByUsername(userName);
 		if (user==null) {
@@ -70,18 +82,49 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
+	/**
+	 * Get User object for provided user name
+	 *
+	 * @param userName
+	 * @return User
+	 */
 	public User getUserByUsername(String userName) {
 		return userService.getUserByUsername(userName);
 	}
-	
+
+	/**
+	 * Get User objects for all users currently in system
+	 *
+	 * @return List<User>
+	 */
 	public List<User> getAllUsers() {
 		return userService.getAllUsers();
 	}
-	
+
+	/**
+	 * Get number of users currently stored in system
+	 *
+	 * @return int
+	 */
+	public int getUserCount() {
+		return userService.getUserCount();
+	}
+
+	/**
+	 * Add a user to the system
+	 *
+	 * @param user object
+	 */
 	public void addUser(User user) {
 		userService.addUser(user);
 	}
-	
+
+	/**
+	 * Get trip deals for a provided user from the TripService
+	 *
+	 * @param userName
+	 * @return List<Provider>
+	 */
 	public List<Provider> getTripDeals(String userName) {
 		User user = getUserByUsername(userName);
 		if (user == null) {
@@ -90,6 +133,16 @@ public class TourGuideService {
 		return tripService.getTripDeals(getUserByUsername(userName));
 	}
 
+	/**
+	 * Track user's current location
+	 *
+	 * Gets users location from GpsService
+	 * Then adds this location to user's visited locations
+	 * Then asks reward service to calculate user's rewards to update with new location
+	 *
+	 * @param user
+	 * @return VisitedLocation user's current location
+	 */
 	public VisitedLocation trackUserLocation(User user) {
 
 		VisitedLocation visitedLocation = gpsService.getUserLocation(user.getUserId());
@@ -102,6 +155,14 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
+	/**
+	 * Track all users' current location
+	 *
+	 * For each user:
+	 * Gets users location from GpsService
+	 * Then adds this location to user's visited locations
+	 *
+	 */
 	public void trackAllUserLocations() {
 		List<User> allUsers = userService.getAllUsers();
 
@@ -130,6 +191,15 @@ public class TourGuideService {
 
 	}
 
+	/**
+	 * Track all users' current location, then check if any new rewards are triggered
+	 *
+	 * For each user:
+	 * Gets users location from GpsService
+	 * Then adds this location to user's visited locations
+	 * Then asks reward service to calculate user's rewards to update with new location
+	 *
+	 */
 	public void trackAllUserLocationsAndProcess() {
 
 
@@ -161,6 +231,13 @@ public class TourGuideService {
 
 	}
 
+	/**
+	 * Process any pending rewards for all users
+	 *
+	 * For each user:
+	 * Asks reward service to calculate user's rewards to update with any new visited locations
+	 *
+	 */
 	public void processAllUserRewards() {
 
 
@@ -191,11 +268,24 @@ public class TourGuideService {
 
 	}
 
+	/**
+	 * Get all users' current locations from UserService
+	 *
+	 * @return List<UserLocation> all users' current location
+	 */
 	public List<UserLocation> getAllCurrentLocations() {
 		return userService.getAllCurrentLocations();
 	}
 
-	//Returns 5 nearest attractions
+	/**
+	 * Get five nearest attractions for provided location
+	 *
+	 * Gets all attractions from GpsService, and sorts by distance from provided location.
+	 * Then returns the nearest five (or as many as possible, if GpsService has less than 5 total).
+	 *
+	 * @param visitedLocation
+	 * @return List<NearbyAttraction>
+	 */
 	public List<NearbyAttraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		List<Attraction> attractionsList;
 		Map<Double, Attraction> attractionsMap = new HashMap<>();
@@ -233,7 +323,7 @@ public class TourGuideService {
 	private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
 		return getDistance(attraction, visitedLocation.location) > proximityBuffer ? false : true;
 	}
-	public double getDistance(Location loc1, Location loc2) {
+	private double getDistance(Location loc1, Location loc2) {
 		double lat1 = Math.toRadians(loc1.latitude);
 		double lon1 = Math.toRadians(loc1.longitude);
 		double lat2 = Math.toRadians(loc2.latitude);
@@ -300,12 +390,4 @@ public class TourGuideService {
 	    return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
 	}
 
-	public int getUserCount() {
-		return userService.getUserCount();
-	}
-
-	public void generateRewards(String userName) {
-		User user = getUserByUsername(userName);
-		userService.addUserReward(userName, user.getLastVisitedLocation(), gpsService.getAttractions().get(0), 100);
-	}
 }

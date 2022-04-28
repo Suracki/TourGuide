@@ -16,6 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
+/**
+ * UserService contains our collection of users, and performs associated tasks for main TourGuide application
+ *
+ * Currently, to allow concurrent access we use a ConcurrentMap to store Users.
+ * In a real system we would adapt this class to interface with a database or similar storage solution instead
+ */
 @Service
 public class UserService {
     private Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -26,15 +32,12 @@ public class UserService {
         usersByName = new ConcurrentHashMap<String, User>(CAPACITY);
     }
 
-    public int addUsers(List<User> startingUsers) {
-        for (User user : startingUsers){
-            if(!usersByName.containsKey(user.getUserName())) {
-                usersByName.put(user.getUserName(), user);
-            }
-        }
-        return usersByName.size();
-    }
-
+    /**
+     * Add a user to the collection
+     *
+     * @param user
+     * @return boolean true if successful, false if user already exists with this username
+     */
     public boolean addUser(User user){
         if(!usersByName.containsKey(user.getUserName())) {
             usersByName.put(user.getUserName(), user);
@@ -43,6 +46,13 @@ public class UserService {
         return false;
     }
 
+    /**
+     * Add a VisitedLocation to a stored User
+     *
+     * @param visitedLocation
+     * @param userName
+     * @return boolean true if successful, false if user not found
+     */
     public boolean addToVisitedLocations(VisitedLocation visitedLocation, String userName) {
         User user = usersByName.get(userName);
         if (user != null) {
@@ -52,6 +62,11 @@ public class UserService {
         return false;
     }
 
+    /**
+     * Get all users' current locations
+     *
+     * @return List<UserLocation>
+     */
     public List<UserLocation> getAllCurrentLocations() {
         List<UserLocation> userLocations = new ArrayList<>();
         usersByName.forEach((k,v)-> {
@@ -60,6 +75,15 @@ public class UserService {
         return userLocations;
     }
 
+    /**
+     * Generate and add a UserReward to a stored User
+     *
+     * @param userName
+     * @param visitedLocation
+     * @param attraction
+     * @param rewardPoints
+     * @return boolean true if successful, false if user not found
+     */
     public boolean addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
         User user = getUserByUsername(userName);
         if (user != null) {
@@ -69,14 +93,31 @@ public class UserService {
         return false;
     }
 
+    /**
+     * Get all users currently stored in system
+     *
+     * @return List<User>
+     */
     public List<User> getAllUsers() {
         return usersByName.values().stream().collect(Collectors.toList());
     }
 
+    /**
+     * Get user from system by userName
+     * Returns null if user does not exist
+     *
+     * @param userName
+     * @return User
+     */
     public User getUserByUsername(String userName) {
         return usersByName.get(userName);
     }
 
+    /**
+     * Get count of all users currently stored in system
+     *
+     * @return int
+     */
     public int getUserCount() {
         return usersByName.size();
     }

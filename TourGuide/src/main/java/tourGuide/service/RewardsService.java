@@ -14,7 +14,9 @@ import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.user.User;
 
-
+/**
+ * RewardsService interfaces with RewardCentral and performs associated tasks for main TourGuide application
+ */
 @Service
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
@@ -37,32 +39,56 @@ public class RewardsService {
 		this.rewardsCentral = rewardCentral;
 		this.userService = userService;
 	}
-	
+
+	/**
+	 * Set a value for the Proximity Buffer
+	 * This controls how close a user's location has to be to an Attraction to gain rewards
+	 *
+	 * @param proximityBuffer int value for distance
+	 */
 	public void setProximityBuffer(int proximityBuffer) {
 		this.proximityBuffer = proximityBuffer;
 	}
-	
+
+	/**
+	 * Set the Proximity Buffer back to it's default value, as stored in defaultProximityBuffer
+	 */
 	public void setDefaultProximityBuffer() {
 		proximityBuffer = defaultProximityBuffer;
 	}
-	
+
+	/**
+	 * Check if a provided Location is within range of an Attraction
+	 *
+	 * @param attraction
+	 * @param location
+	 */
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
 		return getDistance(attraction, location) > attractionProximityRange ? false : true;
 	}
-	
+
+	//Check if a VisitedLocation is within range of an Attraction
 	private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
 		return getDistance(attraction, visitedLocation.location) > proximityBuffer ? false : true;
 	}
-	
+
+	//Get reward point value of an attraction for a provided UUID
 	private int getRewardPoints(Attraction attraction, UUID userid) {
 		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, userid);
 	}
 
+	/**
+	 * Get Reward Point value of an attraction for a user
+	 *
+	 * @param userid UUID of user
+	 * @param attraction
+	 */
 	public int getRewardValue(Attraction attraction, UUID userid) {
 		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, userid);
 	}
-	
-	public double getDistance(Location loc1, Location loc2) {
+
+	//Get distance between two locations
+	private double getDistance(Location loc1, Location loc2) {
         double lat1 = Math.toRadians(loc1.latitude);
         double lon1 = Math.toRadians(loc1.longitude);
         double lat2 = Math.toRadians(loc2.latitude);
@@ -76,6 +102,15 @@ public class RewardsService {
         return statuteMiles;
 	}
 
+	/**
+	 * Calculate rewards for a provided User
+	 *
+	 * Checks all user's VisitedLocations, compares each to list of Attractions from GpsService
+	 * If a user has visited an attraction (ie visited location is in range of an attraction)
+	 * Add reward to user for that attraction if they have not already received a reward for it
+	 *
+	 * @param user User object
+	 */
 	public void calculateRewards(User user) {
 
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
@@ -109,6 +144,16 @@ public class RewardsService {
 		});
 	}
 
+	/**
+	 * Calculate rewards for a provided User
+	 *
+	 * Checks all user's VisitedLocations, compares each to list of Attractions from GpsService
+	 * If a user has visited an attraction (ie visited location is in range of an attraction)
+	 * Add reward to user for that attraction if they have not already received a reward for it
+	 *
+	 * @param user User object
+	 * @return String user name
+	 */
 	public String calculateRewardsReturn(User user) {
 
 		List<VisitedLocation> userLocations = user.getVisitedLocations();

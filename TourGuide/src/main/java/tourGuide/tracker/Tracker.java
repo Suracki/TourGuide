@@ -1,6 +1,5 @@
 package tourGuide.tracker;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -11,8 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
 
+/**
+ * Tracker thread regularly prompts TourGuideService to track user locations and process any new rewards
+ */
 public class Tracker extends Thread {
 	private Logger logger = LoggerFactory.getLogger(Tracker.class);
 	@Value("${tracking.polling.interval}")
@@ -47,7 +48,6 @@ public class Tracker extends Thread {
 			
 			logger.debug("Begin Tracker. Tracking " + tourGuideService.getUserCount() + " users.");
 			stopWatch.start();
-			//tourGuideService.trackAllUserLocations();
 			tourGuideService.trackAllUserLocationsAndProcess();
 			stopWatch.stop();
 			logger.debug("Tracker Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 

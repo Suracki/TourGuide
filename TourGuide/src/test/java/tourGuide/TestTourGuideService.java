@@ -122,7 +122,7 @@ public class TestTourGuideService {
 
 		Assertions.assertThat(allUserLocations)
 				.hasSize(2)
-				.extracting(UserLocation::getUserID)
+				.extracting("userId")
 				.containsExactlyInAnyOrder(user.getUserId().toString(), userTwo.getUserId().toString());
 	}
 	

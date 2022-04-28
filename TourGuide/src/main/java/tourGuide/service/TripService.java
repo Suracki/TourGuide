@@ -10,6 +10,9 @@ import tripPricer.TripPricer;
 
 import java.util.List;
 
+/**
+ * TripService interfaces with TripPricer and performs associated tasks for main TourGuide application
+ */
 @Service
 public class TripService {
 
@@ -23,6 +26,14 @@ public class TripService {
         this.tripPricer = tripPricer;
     }
 
+    /**
+     * Get trip deals for a provided User
+     * Queries TripPricer with various user details (including preferences such as number of adults/children)
+     * TripPricer responds with 5 trip deals for user based on provided requirements
+     *
+     * @param user
+     * @return List<Provider>
+     */
     public List<Provider> getTripDeals(User user) {
         int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
         List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),

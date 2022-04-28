@@ -5,7 +5,7 @@ import gpsUtil.location.VisitedLocation;
 import java.util.UUID;
 
 public class UserLocation {
-    String userId;
+    public String userId;
     double longitude;
     double latitude;
 
