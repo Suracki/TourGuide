@@ -1,0 +1,8 @@
+tourGuide
+tourGuide.controller
+tourGuide.helper
+tourGuide.module
+tourGuide.outputEntities
+tourGuide.service
+tourGuide.tracker
+tourGuide.user

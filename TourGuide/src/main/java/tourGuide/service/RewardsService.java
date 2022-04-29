@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import tourGuide.user.User;
  */
 @Service
 public class RewardsService {
+	private Logger logger = LoggerFactory.getLogger(RewardsService.class);
+
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
 	// proximity in miles
@@ -47,6 +51,7 @@ public class RewardsService {
 	 * @param proximityBuffer int value for distance
 	 */
 	public void setProximityBuffer(int proximityBuffer) {
+		logger.debug("setProximityBuffer: updating proximity buffer to " + proximityBuffer);
 		this.proximityBuffer = proximityBuffer;
 	}
 
@@ -54,6 +59,7 @@ public class RewardsService {
 	 * Set the Proximity Buffer back to it's default value, as stored in defaultProximityBuffer
 	 */
 	public void setDefaultProximityBuffer() {
+		logger.debug("setDefaultProximityBuffer: resetting proximity buffer to " + defaultProximityBuffer);
 		proximityBuffer = defaultProximityBuffer;
 	}
 

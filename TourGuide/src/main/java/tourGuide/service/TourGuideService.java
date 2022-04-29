@@ -62,7 +62,12 @@ public class TourGuideService {
 	 * @return list of UserReward objects for provided user
 	 */
 	public List<UserReward> getUserRewards(String userName) {
-		return getUserByUsername(userName).getUserRewards();
+		User user = getUserByUsername(userName);
+		if (user == null) {
+			logger.debug("getUserRewards: user not found with name " + userName + " returning null");
+			return null;
+		}
+		return user.getUserRewards();
 	}
 
 	/**
@@ -74,6 +79,7 @@ public class TourGuideService {
 	public VisitedLocation getUserLocation(String userName) {
 		User user = getUserByUsername(userName);
 		if (user==null) {
+			logger.debug("getUserLocation: user not found with name " + userName + " returning null");
 			return null;
 		}
 		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ?
@@ -128,6 +134,7 @@ public class TourGuideService {
 	public List<Provider> getTripDeals(String userName) {
 		User user = getUserByUsername(userName);
 		if (user == null) {
+			logger.debug("getTripDeals: user not found with name " + userName + " returning null");
 			return null;
 		}
 		return tripService.getTripDeals(getUserByUsername(userName));
@@ -156,6 +163,34 @@ public class TourGuideService {
 	}
 
 	/**
+	 * Track user's current location
+	 *
+	 * Gets users location from GpsService
+	 * Then adds this location to user's visited locations
+	 * Then asks reward service to calculate user's rewards to update with new location
+	 *
+	 * @param userName name of User to be tracked
+	 * @return VisitedLocation of user's current location
+	 */
+	public VisitedLocation trackUserLocationByUsername(String userName) {
+
+		User user = getUserByUsername(userName);
+		if (user == null) {
+			logger.debug("trackUserLocationByUsername: user not found with name " + userName + " returning null");
+			return null;
+		}
+
+		VisitedLocation visitedLocation = gpsService.getUserLocation(user.getUserId());
+
+		CompletableFuture.supplyAsync(()-> {
+					return userService.addToVisitedLocations(visitedLocation, user.getUserName());
+				}, executorService)
+				.thenAccept(n -> {rewardsService.calculateRewards(user);});
+
+		return visitedLocation;
+	}
+
+	/**
 	 * Track all users' current location
 	 *
 	 * For each user:
@@ -168,7 +203,7 @@ public class TourGuideService {
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
-		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+		logger.debug("trackAllUserLocations: Creating futures for " + allUsers.size() + " user(s)");
 		allUsers.forEach((n)-> {
 			futures.add(
 					CompletableFuture.supplyAsync(()-> {
@@ -176,8 +211,7 @@ public class TourGuideService {
 					}, executorService)
 			);
 		});
-		System.out.println("Futures created: " + futures.size());
-		System.out.println("Getting futures...");
+		logger.debug("trackAllUserLocations: Futures created: " + futures.size() + ". Getting futures...");
 		futures.forEach((n)-> {
 			try {
 				n.get();
@@ -187,7 +221,7 @@ public class TourGuideService {
 				e.printStackTrace();
 			}
 		});
-		System.out.println("Done!");
+		logger.debug("trackAllUserLocations: Done!");
 
 	}
 
@@ -207,7 +241,7 @@ public class TourGuideService {
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
-		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+		logger.debug("trackAllUserLocationsAndProcess: Creating futures for " + allUsers.size() + " user(s)");
 		allUsers.forEach((n)-> {
 			futures.add(
 			CompletableFuture.supplyAsync(()-> {
@@ -216,8 +250,7 @@ public class TourGuideService {
 					.thenAccept(y -> {rewardsService.calculateRewards(n);})
 			);
 		});
-		System.out.println("Futures created: " + futures.size());
-		System.out.println("Getting futures...");
+		logger.debug("trackAllUserLocationsAndProcess: Futures created: " + futures.size() + ". Getting futures...");
 		futures.forEach((n)-> {
 			try {
 				n.get();
@@ -227,7 +260,7 @@ public class TourGuideService {
 				e.printStackTrace();
 			}
 		});
-		System.out.println("Done!");
+		logger.debug("Done!");
 
 	}
 
@@ -245,7 +278,7 @@ public class TourGuideService {
 
 		ArrayList<CompletableFuture> futures = new ArrayList<>();
 
-		System.out.println("Creating threads for " + allUsers.size() + " user(s)");
+		logger.debug("processAllUserRewards: Creating threads for " + allUsers.size() + " user(s)");
 		allUsers.forEach((n)-> {
 			futures.add(
 					CompletableFuture.supplyAsync(()-> {
@@ -253,8 +286,7 @@ public class TourGuideService {
 							}, executorService)
 			);
 		});
-		System.out.println("Futures created: " + futures.size());
-		System.out.println("Getting futures...");
+		logger.debug("processAllUserRewards: Futures created: " + futures.size() + ". Getting futures...");
 		futures.forEach((n)-> {
 			try {
 				n.get();
@@ -264,7 +296,7 @@ public class TourGuideService {
 				e.printStackTrace();
 			}
 		});
-		System.out.println("Done!");
+		logger.debug("processAllUserRewards: Done!");
 
 	}
 
@@ -301,6 +333,7 @@ public class TourGuideService {
 			attractionsList = new ArrayList<>(sortedAttractionMap.values()).subList(0,5);
 		}
 		else {
+			logger.debug("getNearByAttractions: gpsService provided less than 5 attractions");
 			attractionsList = new ArrayList<>(sortedAttractionMap.values()).subList(0,sortedAttractionMap.size());
 		}
 
@@ -361,7 +394,6 @@ public class TourGuideService {
 			generateUserLocationHistory(user);
 
 			userService.addUser(user);
-			System.out.println(userName);
 		});
 
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");

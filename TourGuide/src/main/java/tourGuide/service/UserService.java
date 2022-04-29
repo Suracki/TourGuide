@@ -59,6 +59,7 @@ public class UserService {
             user.addToVisitedLocations(visitedLocation);
             return true;
         }
+        logger.debug("addToVisitedLocations: user not found with name " + userName + " returning false");
         return false;
     }
 
@@ -90,6 +91,7 @@ public class UserService {
             user.addUserReward(new UserReward(visitedLocation, attraction, rewardPoints));
             return true;
         }
+        logger.debug("addUserReward: user not found with name " + userName + " returning false");
         return false;
     }
 
