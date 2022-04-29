@@ -58,8 +58,8 @@ public class TourGuideService {
 	/**
 	 * Get all current UserRewards for provided user
 	 *
-	 * @param userName
-	 * @return List<UserReward>
+	 * @param userName user's userName
+	 * @return list of UserReward objects for provided user
 	 */
 	public List<UserReward> getUserRewards(String userName) {
 		return getUserByUsername(userName).getUserRewards();
@@ -68,8 +68,8 @@ public class TourGuideService {
 	/**
 	 * Get current location of provided user
 	 *
-	 * @param userName
-	 * @return VisitedLocation
+	 * @param userName user's userName
+	 * @return current location of user
 	 */
 	public VisitedLocation getUserLocation(String userName) {
 		User user = getUserByUsername(userName);
@@ -85,8 +85,8 @@ public class TourGuideService {
 	/**
 	 * Get User object for provided user name
 	 *
-	 * @param userName
-	 * @return User
+	 * @param userName user's userName
+	 * @return user object
 	 */
 	public User getUserByUsername(String userName) {
 		return userService.getUserByUsername(userName);
@@ -95,7 +95,7 @@ public class TourGuideService {
 	/**
 	 * Get User objects for all users currently in system
 	 *
-	 * @return List<User>
+	 * @return list of User objects for all users
 	 */
 	public List<User> getAllUsers() {
 		return userService.getAllUsers();
@@ -104,7 +104,7 @@ public class TourGuideService {
 	/**
 	 * Get number of users currently stored in system
 	 *
-	 * @return int
+	 * @return number of users currently stored, as integer
 	 */
 	public int getUserCount() {
 		return userService.getUserCount();
@@ -113,7 +113,7 @@ public class TourGuideService {
 	/**
 	 * Add a user to the system
 	 *
-	 * @param user object
+	 * @param user User object to be added
 	 */
 	public void addUser(User user) {
 		userService.addUser(user);
@@ -122,8 +122,8 @@ public class TourGuideService {
 	/**
 	 * Get trip deals for a provided user from the TripService
 	 *
-	 * @param userName
-	 * @return List<Provider>
+	 * @param userName user's userName
+	 * @return List of Provider objects for trip deals suggested by TripService
 	 */
 	public List<Provider> getTripDeals(String userName) {
 		User user = getUserByUsername(userName);
@@ -140,8 +140,8 @@ public class TourGuideService {
 	 * Then adds this location to user's visited locations
 	 * Then asks reward service to calculate user's rewards to update with new location
 	 *
-	 * @param user
-	 * @return VisitedLocation user's current location
+	 * @param user User to be tracked
+	 * @return VisitedLocation of user's current location
 	 */
 	public VisitedLocation trackUserLocation(User user) {
 
@@ -271,7 +271,7 @@ public class TourGuideService {
 	/**
 	 * Get all users' current locations from UserService
 	 *
-	 * @return List<UserLocation> all users' current location
+	 * @return List of all users' current locations as UserLocation objects
 	 */
 	public List<UserLocation> getAllCurrentLocations() {
 		return userService.getAllCurrentLocations();
@@ -283,8 +283,8 @@ public class TourGuideService {
 	 * Gets all attractions from GpsService, and sorts by distance from provided location.
 	 * Then returns the nearest five (or as many as possible, if GpsService has less than 5 total).
 	 *
-	 * @param visitedLocation
-	 * @return List<NearbyAttraction>
+	 * @param visitedLocation location to be used
+	 * @return List of five NearbyAttraction objects
 	 */
 	public List<NearbyAttraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		List<Attraction> attractionsList;

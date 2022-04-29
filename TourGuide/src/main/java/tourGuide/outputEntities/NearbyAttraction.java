@@ -1,5 +1,8 @@
 package tourGuide.outputEntities;
 
+/**
+ * NearbyAttraction is an output entity used to allow the correct formatting of responses to the /getNearbyAttractions endpoint
+ */
 public class NearbyAttraction {
     String attractionName;
     Double attractionLatitute;

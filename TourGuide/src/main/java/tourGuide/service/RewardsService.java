@@ -60,8 +60,10 @@ public class RewardsService {
 	/**
 	 * Check if a provided Location is within range of an Attraction
 	 *
-	 * @param attraction
-	 * @param location
+	 * @param attraction attraction to be checked
+	 * @param location location to be compared to
+	 *
+	 * @return true if location is within range, otherwise false
 	 */
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
 		return getDistance(attraction, location) > attractionProximityRange ? false : true;
@@ -81,7 +83,8 @@ public class RewardsService {
 	 * Get Reward Point value of an attraction for a user
 	 *
 	 * @param userid UUID of user
-	 * @param attraction
+	 * @param attraction attraction to be checked
+	 * @return reward value as integer
 	 */
 	public int getRewardValue(Attraction attraction, UUID userid) {
 		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, userid);
@@ -152,7 +155,7 @@ public class RewardsService {
 	 * Add reward to user for that attraction if they have not already received a reward for it
 	 *
 	 * @param user User object
-	 * @return String user name
+	 * @return userName
 	 */
 	public String calculateRewardsReturn(User user) {
 

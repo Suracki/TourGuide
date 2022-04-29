@@ -21,7 +21,7 @@ public class InternalTestHelper {
 	/**
 	 * Get method for number of users to be created
 	 *
-	 * @return internameUserNumber
+	 * @return current value of internalUserNumber
 	 */
 	public static int getInternalUserNumber() {
 		return internalUserNumber;

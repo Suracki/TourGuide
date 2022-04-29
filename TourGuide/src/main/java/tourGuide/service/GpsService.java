@@ -29,7 +29,7 @@ public class GpsService {
      * Queries GpsUtil to get location of user with provided UUID
      *
      * @param userId UUID of user to be located
-     * @return VisitedLocation current location of user
+     * @return current location of user
      */
     public VisitedLocation getUserLocation(UUID userId) {
         return gpsUtil.getUserLocation(userId);
@@ -40,7 +40,7 @@ public class GpsService {
      *
      * Queries GpsUtil to get all available attractions currently available
      *
-     * @return List<Attraction> list of Attraction objects for all available attractions
+     * @return list of Attraction objects for all available attractions
      */
     public List<Attraction> getAttractions() {
         return new ArrayList<Attraction>(gpsUtil.getAttractions());

@@ -9,6 +9,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 
+/**
+ * User is the model entity to store User entries
+ */
 public class User {
 	private final UUID userId;
 	private final String userName;

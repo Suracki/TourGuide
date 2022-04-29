@@ -31,8 +31,8 @@ public class TripService {
      * Queries TripPricer with various user details (including preferences such as number of adults/children)
      * TripPricer responds with 5 trip deals for user based on provided requirements
      *
-     * @param user
-     * @return List<Provider>
+     * @param user user for whom deals are to be found
+     * @return suggested deals as a List of Provider objects
      */
     public List<Provider> getTripDeals(User user) {
         int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();

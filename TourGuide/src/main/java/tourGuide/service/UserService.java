@@ -35,7 +35,7 @@ public class UserService {
     /**
      * Add a user to the collection
      *
-     * @param user
+     * @param user User object to be added
      * @return boolean true if successful, false if user already exists with this username
      */
     public boolean addUser(User user){
@@ -49,8 +49,8 @@ public class UserService {
     /**
      * Add a VisitedLocation to a stored User
      *
-     * @param visitedLocation
-     * @param userName
+     * @param visitedLocation VisitedLocation object to be added to user
+     * @param userName name of user
      * @return boolean true if successful, false if user not found
      */
     public boolean addToVisitedLocations(VisitedLocation visitedLocation, String userName) {
@@ -65,7 +65,7 @@ public class UserService {
     /**
      * Get all users' current locations
      *
-     * @return List<UserLocation>
+     * @return List of UserLocation objects
      */
     public List<UserLocation> getAllCurrentLocations() {
         List<UserLocation> userLocations = new ArrayList<>();
@@ -78,10 +78,10 @@ public class UserService {
     /**
      * Generate and add a UserReward to a stored User
      *
-     * @param userName
-     * @param visitedLocation
-     * @param attraction
-     * @param rewardPoints
+     * @param userName user's userName
+     * @param visitedLocation the location user was tracked at
+     * @param attraction the attraction the reward is for
+     * @param rewardPoints the points to be added
      * @return boolean true if successful, false if user not found
      */
     public boolean addUserReward(String userName, VisitedLocation visitedLocation, Attraction attraction, int rewardPoints) {
@@ -96,7 +96,7 @@ public class UserService {
     /**
      * Get all users currently stored in system
      *
-     * @return List<User>
+     * @return List of User objects
      */
     public List<User> getAllUsers() {
         return usersByName.values().stream().collect(Collectors.toList());
@@ -106,8 +106,8 @@ public class UserService {
      * Get user from system by userName
      * Returns null if user does not exist
      *
-     * @param userName
-     * @return User
+     * @param userName user's userName
+     * @return User object
      */
     public User getUserByUsername(String userName) {
         return usersByName.get(userName);
@@ -116,7 +116,7 @@ public class UserService {
     /**
      * Get count of all users currently stored in system
      *
-     * @return int
+     * @return count of all users currently stored in system
      */
     public int getUserCount() {
         return usersByName.size();

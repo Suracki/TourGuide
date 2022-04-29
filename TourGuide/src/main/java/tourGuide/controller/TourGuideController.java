@@ -31,6 +31,8 @@ public class TourGuideController {
      * Mapping for root url
      *
      * Takes no parameters, simply returns welcome message
+     *
+     * @return welcome message String
      */
     @RequestMapping("/")
     public String index() {
@@ -115,6 +117,7 @@ public class TourGuideController {
      * Json object containing 5 trip deals for user. Includes the attraction name, price, and tripId.
      * "User Not Found [userName]" if user is not in system
      *
+     * @param userName user's userName
      * @return Json string of all users' current locations.
      */
     @GetMapping("/getTripDeals")
