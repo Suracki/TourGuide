@@ -38,7 +38,7 @@ public class TestRewardsService {
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
 		tourGuideService.addUser(user);
 
-		rewardsService.calculateRewards(user);
+		rewardsService.calculateRewardsReturn(user);
 
 		User updatedUser = userService.getUserByUsername(user.getUserName());
 
@@ -69,9 +69,10 @@ public class TestRewardsService {
 
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsService, rewardsService, userService, tripService);
-		
-		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
+
+		rewardsService.calculateRewardsReturn(tourGuideService.getAllUsers().get(0));
 		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0).getUserName());
+		System.out.println(userRewards.size());
 		tourGuideService.tracker.stopTracking();
 
 		assertEquals(gpsUtil.getAttractions().size(), userRewards.size());

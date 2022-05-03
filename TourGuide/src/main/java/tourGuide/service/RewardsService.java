@@ -151,6 +151,7 @@ public class RewardsService {
 				e.printStackTrace();
 			}
 		});
+
 	}
 
 	/**
