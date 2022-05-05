@@ -46,19 +46,6 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.6.RELEASE'
 }
 
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title': 'Jar File Creation',
-                'Implementation-Version': 1.0,
-                'Main-Class': 'tourGuide'
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-
-
 jacoco {
     toolVersion = "0.8.4"
 }
