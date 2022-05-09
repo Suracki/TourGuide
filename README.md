@@ -110,7 +110,7 @@ The updated architechture diagram for the application is:
 
 Simon Linford - simon.linford@gmail.com
 
-Project Link: [https://github.com/suracki/paymybuddy](https://github.com/suracki/paymybuddy)
+Project Link: [https://github.com/suracki/tourguide](https://github.com/suracki/tourguide)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
