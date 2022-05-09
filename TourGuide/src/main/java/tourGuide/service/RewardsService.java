@@ -146,9 +146,9 @@ public class RewardsService {
 			try {
 				n.get();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error("Calculate Rewards InterruptedException: " + e);
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				logger.error("Calculate Rewards ExecutionException: " + e);
 			}
 		});
 
@@ -190,9 +190,9 @@ public class RewardsService {
 			try {
 				n.get();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error("Calculate Rewards InterruptedException: " + e);
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				logger.error("Calculate Rewards ExecutionException: " + e);
 			}
 		});
 

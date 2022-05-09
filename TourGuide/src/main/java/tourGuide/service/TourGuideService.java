@@ -216,9 +216,9 @@ public class TourGuideService {
 			try {
 				n.get();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error("Track All Users InterruptedException: " + e);
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				logger.error("Track All Users ExecutionException: " + e);
 			}
 		});
 		logger.debug("trackAllUserLocations: Done!");
@@ -255,9 +255,9 @@ public class TourGuideService {
 			try {
 				n.get();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error("Track All Users And Process InterruptedException: " + e);
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				logger.error("Track All Users And Process ExecutionException: " + e);
 			}
 		});
 		logger.debug("Done!");
@@ -291,9 +291,9 @@ public class TourGuideService {
 			try {
 				n.get();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error("Process All User Rewards InterruptedException: " + e);
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				logger.error("Process All User Rewards ExecutionException: " + e);
 			}
 		});
 		logger.debug("processAllUserRewards: Done!");
