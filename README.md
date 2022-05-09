@@ -32,15 +32,15 @@ This project is the backend for that system.
    ```sh
    git clone https://github.com/suracki/tourguide.git
    ```
-3. Set configuration variables in `application.properties` as desired
-	```variables available:
+3. Set configuration variables in `application.properties` as desired. Variables available:
+	```
    logging.level.tourGuide -> the desired logging level, default is DEBUG
    tripPricer.api.key -> the api key for accessing tripPricer, default is test-server-api-key
    tracking.polling.interval -> the frequency with which the application requests user locations in minutes, default is 5
    thread.pool.size -> the size used for thread pools within the app, default is 500
    ```
-4. Start the application running by using Application
-	```Once the app is running, the following endpoints are available:
+4. Start the application running by using Application. Once the app is running, the following endpoints are available:
+	```
 	http://localhost:8080/ -> welcome message
 	http://localhost:8080/getLocation?userName -> request user location
 	http://localhost:8080/getNearbyAttractions?userName -> request 5 nearest attractions
