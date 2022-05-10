@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 
+/**
+ * User is the model entity to store User entries
+ */
 public class User {
 	private final UUID userId;
 	private final String userName;
@@ -15,7 +19,7 @@ public class User {
 	private String emailAddress;
 	private Date latestLocationTimestamp;
 	private List<VisitedLocation> visitedLocations = new ArrayList<>();
-	private List<UserReward> userRewards = new ArrayList<>();
+	private List<UserReward> userRewards = new CopyOnWriteArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
@@ -62,7 +66,7 @@ public class User {
 	}
 	
 	public List<VisitedLocation> getVisitedLocations() {
-		return visitedLocations;
+		return new ArrayList<VisitedLocation>(visitedLocations);
 	}
 	
 	public void clearVisitedLocations() {
@@ -70,13 +74,23 @@ public class User {
 	}
 	
 	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
-			userRewards.add(userReward);
-		}
+			boolean found = false;
+			for (UserReward reward : userRewards) {
+				if (reward.attraction.attractionName.equals(userReward.attraction.attractionName)) {
+					found = true;
+				}
+			}
+			if (found) {
+				//Do not add duplicate
+			}
+			else {
+				//Add reward
+				userRewards.add(userReward);
+			}
 	}
 	
 	public List<UserReward> getUserRewards() {
-		return userRewards;
+		return new ArrayList<UserReward>(userRewards);
 	}
 	
 	public UserPreferences getUserPreferences() {
